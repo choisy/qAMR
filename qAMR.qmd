@@ -4,3 +4,197 @@ format: html
 editor: visual
 ---
 
+```{r}
+polygon2 <- function(x, y, col = 4, alpha = .2, ...) {
+  polygon(c(x[1], x, tail(x, 1)), c(0, y, 0), col = adjustcolor(col, alpha),
+          border = NA)
+}
+```
+
+
+```{r}
+x <- seq(0, 10, le = 512)
+y1 <- dnorm(x, 2.5, .8)
+y2 <- dnorm(x,7, .5)
+plot(x, y1, type = "n")
+# lines(x, .25 * y2)
+polygon2(x, y1)
+polygon2(x, .25 * y2)
+```
+```{r}
+C0 <- 1
+C1 <- 3
+mic <- seq(0, 10, le = 512)
+x <- log(mic / C0) / log(C1 / C0)
+plot(mic, x, type = "l", lwd = 4, col = 4)
+#abline(h = 0:1)
+#abline(v = c(C0, C1))
+```
+
+```{r}
+k <- function(x, k0, k1) {
+  k0 * (k1 / k0)^x
+}
+
+x <- seq(-2, 4, le = 512)
+plot(x, k(x, 5, 3), type = "l", col = 4, lwd = 4)
+```
+
+```{r}
+p <- function(x, pm, p0, p1) {
+  pm / (1 + ((pm - p0) / p0) * (p0 * (pm - p1) / (p1 * (pm - p0)))^x)
+}
+
+x <- seq(-9, 10, le = 512)
+plot(x, p(x, 10, 5, 3), type = "l", col = 4, lwd = 4)
+```
+
+```{r}
+R0 <- function(x, k0 = 3, k1 = .03, pm = 10, p0 = 9.5, p1 = 4.75, mu = .9) {
+  p(x, pm, p0, p1) / (mu + k(x, k0, k1))
+}
+
+R00 <- function(x, pm = 10, p0 = 9.5, p1 = 4.75, mu = .9) {
+  p(x, pm, p0, p1) / (mu)
+}
+
+x <- seq(-.5, 1.5, le = 512)
+
+plot(x, R00(x), type = "l", col = 4, lwd = 4, ylim = c(0, 11))
+lines(x, R0(x), col = 2, lwd = 4)
+
+#abline(v = c(0, 1))
+#abline(h = c(0, 1))
+```
+
+## Matlab code
+
+```{r}
+h_S <- function(x, mu, pm, p0) {
+  mu / (1 / (1 - p0 / pm) - x)
+}
+```
+
+```{r}
+h_R <- function(x, mu, pm, p1, k0_1) {
+  k0_1 * mu / (1 / (1 - p0 / pm) - x)
+}
+```
+
+```{r}
+R_evol_level <- function(k0, k1, p1, p0, pm, mu, ...) {
+  d <- k0 / k1
+  b <- pm / p0 - 1
+  a <- p0 * (pm - p1) / (p1 * (pm - p0))
+  f <- function(x) {
+    abs(log(d) * k0 * (k1 / k0)^x / (mu + k0 * (k1 / k0)^x) -
+      b * log(a) * a^x / (1 + b * a^x))
+  }
+  optimize(f, ...)$minimum
+}
+```
+
+```{r}
+# maximum growth rate of susceptible bacteria:
+pm <- 10
+# maximum growth rate of a bacteria with resistance x = 0 (< pm):
+p0 <- .95 * pm
+# R0 of susceptible bacteria in absence of antimicriobial (> 1):
+R00 <- 10
+# shape parameter of density dependance on bacterial growth:
+alpha <- 1
+# mutations variance in the phenotypic space:
+eps <- .01
+# variance of initial bacterial population:
+sigma0 <- .05
+# size of initial bacterial population:
+size_b0 <- .05
+# simulation time:
+T <- 300
+# p1 / p0 (between 0 and 1):
+p1_0 <- .5
+# k1 / k0:
+k1_0 <- .01
+# antimicrobial activity on a bacteria with resistance x = 0:
+k0 <- 10
+```
+
+```{r}
+# antimicrobial activity on a bacteria with resistance x = 1:
+k1 <- k0 * k1_0
+# bacteria natural death rate:
+mu <- p0 / R00
+# maximum growth rate of a bacteria with resistance x = 1:
+p1 <- p0 * p1_0
+# k0 / k1:
+k0_1 <- 1 / k1_0
+# relative cost of resistance:
+Delta <- p0 * (pm - p1) / (p1 * (pm - p0))
+# average fitness cost-benefice ratio of the resistance:
+Ratio_cost_ben <- log(Delta) / log(k0_1)
+```
+
+R_level = level of resistance, a real parameter
+k0_factor = the efficiency of the MIC (at x=0) = k0/(1+theta)^R_level
+
+Not used:
+
+```{r}
+# ?????????????????
+cb1 <- 1 / (1 - p1 / pm)
+# ?????????????????
+cb0 <- 1 / (1 - p0 / pm)
+# ?????????????????
+k0_effi0 <- mu / cb0
+# ?????????????????
+k0_effi1 <- mu * k0_1 / cb1
+```
+
+```{r}
+xStar <- R_evol_level(k0, k1, p1, p0, pm, mu, c(-10, 10))
+```
+
+```{r}
+curveS <- h_S(Ratio_cost_ben, mu, pm, p0)
+curveR <- h_R(Ratio_cost_ben, mu, pm, p1, k0_1)
+```
+
+Plot of R0:
+
+```{r}
+x <- seq(-.5, 1.5, le = 512)
+k <- k0 * (k1 / k0)^x
+pNum <- 1 + (pm / p0 - 1) * (p0 * (pm - p1) / (p1 * (pm - p0)))^x
+p <- pm / pNum
+R0 <- p / (mu + k)
+
+plot(x, p / mu, type = "l", ylim = c(0, 11))
+lines(x, R0, lty = 2)
+abline(h = max(R0))
+abline(v = xStar)
+```
+
+```{r}
+time <- seq(0, T, le = 512)
+BB0 <- bb <- dnorm(x, size_b0, sigma0)
+```
+
+```{r}
+J <- dnorm(x, 0, eps)
+```
+
+```{r}
+dx <- mean(diff(x))
+
+TotpopB <- sum(bb)
+for (tn in tail(time, -1)) {
+  GrowthRegulator <- 1 / (1 + tail(TotpopB, 1))^alpha
+  IntB <- p * bb
+  LI <- GrowthRegulator * dx * 
+}
+```
+
+```{r}
+head(IntB)
+```
+
