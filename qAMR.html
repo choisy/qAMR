@@ -225,7 +225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">optimize</span>(derivative, <span class="at">interval =</span> interval, ...)<span class="sc">$</span>minimum</span>
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Plot or R0:</p>
+<p>Plot of R0:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>, <span class="at">le =</span> <span class="dv">512</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -276,43 +276,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>A function that numerically integrates the integro-differential equation of the model:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>integrodiffsim <span class="ot">&lt;-</span> <span class="cf">function</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  dx <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">diff</span>(x))</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  dt <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">diff</span>(time))</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">p</span>(x, pm, p0, p1)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  ks <span class="ot">&lt;-</span> <span class="fu">k</span>(x, k0, k1)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  bb <span class="ot">&lt;-</span> size0 <span class="sc">*</span> <span class="fu">dnorm</span>(x, <span class="dv">0</span>, sigma0)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  BB <span class="ot">&lt;-</span> <span class="fu">list</span>(bb)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  tp <span class="ot">&lt;-</span> TP <span class="ot">&lt;-</span> <span class="fu">sum</span>(bb)</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (t <span class="cf">in</span> <span class="fu">tail</span>(time, <span class="sc">-</span><span class="dv">1</span>)) {</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    LI <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(x, <span class="sc">~</span> <span class="fu">sum</span>(<span class="fu">dnorm</span>(.x <span class="sc">-</span> x, <span class="dv">0</span>, eps) <span class="sc">*</span> ps <span class="sc">*</span> bb)) <span class="sc">*</span> dx <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> tp)<span class="sc">^</span>alpha</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    bb <span class="ot">&lt;-</span> (bb <span class="sc">+</span> dt <span class="sc">*</span> LI) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> dt <span class="sc">*</span> (mu <span class="sc">+</span> ks))</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    BB <span class="ot">&lt;-</span> <span class="fu">c</span>(BB, <span class="fu">list</span>(bb))</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    tp <span class="ot">&lt;-</span> <span class="fu">sum</span>(bb)</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    TP <span class="ot">&lt;-</span> <span class="fu">c</span>(TP, tp)</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">BB =</span> <span class="fu">as.matrix</span>(<span class="fu">as.data.frame</span>(BB)), <span class="at">TP =</span> TP, <span class="at">x =</span> x, <span class="at">time =</span> time,</span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">param =</span> <span class="fu">c</span>(<span class="at">size0  =</span> size0,</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sigma0 =</span> sigma0,</span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>                 <span class="at">pm     =</span> pm,</span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>                 <span class="at">p0     =</span> p0,</span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>                 <span class="at">p1     =</span> p1,</span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>                 <span class="at">k0     =</span> k0,</span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>                 <span class="at">k1     =</span> k1,</span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>                 <span class="at">alpha  =</span> alpha,</span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mu     =</span> mu,</span>
-<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>                 <span class="at">eps    =</span> eps))</span>
-<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>simulator <span class="ot">&lt;-</span> <span class="cf">function</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  dt <span class="ot">&lt;-</span> <span class="fu">diff</span>(time)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  dx <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">diff</span>(x))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  A <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> eps<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  B <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(pi <span class="sc">*</span> A)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">p</span>(x, pm, p0, p1)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  ks <span class="ot">&lt;-</span> <span class="fu">k</span>(x, k0, k1)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  J <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(x, <span class="sc">~</span> <span class="fu">exp</span>(<span class="sc">-</span>(.x <span class="sc">-</span> x)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> A) <span class="sc">/</span> B)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  distribution <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="dv">0</span>, sigma0)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  mr_bact_pop <span class="ot">&lt;-</span> size0 <span class="sc">*</span> distribution <span class="sc">/</span> <span class="fu">sum</span>(distribution)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  bact_pop <span class="ot">&lt;-</span> <span class="fu">list</span>(mr_bact_pop)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  mr_pop_size <span class="ot">&lt;-</span> pop_size <span class="ot">&lt;-</span> <span class="fu">sum</span>(mr_bact_pop)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (dt_val <span class="cf">in</span> dt) {</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    L <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(J, <span class="sc">~</span> <span class="fu">sum</span>(.x <span class="sc">*</span> ps <span class="sc">*</span> mr_bact_pop)) <span class="sc">*</span> dx <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> mr_pop_size)<span class="sc">^</span>alpha</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    mr_bact_pop <span class="ot">&lt;-</span> (mr_bact_pop <span class="sc">+</span> dt_val <span class="sc">*</span> L) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> dt_val <span class="sc">*</span> (mu <span class="sc">+</span> ks))</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    bact_pop <span class="ot">&lt;-</span> <span class="fu">c</span>(bact_pop, <span class="fu">list</span>(mr_bact_pop))</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>    mr_pop_size <span class="ot">&lt;-</span> <span class="fu">sum</span>(mr_bact_pop)</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="ot">&lt;-</span> <span class="fu">c</span>(pop_size, mr_pop_size)</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">bact_pop =</span> <span class="fu">as.matrix</span>(<span class="fu">as.data.frame</span>(bact_pop)), <span class="at">pop_size =</span> pop_size,</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> x, <span class="at">time =</span> time, <span class="at">param =</span> <span class="fu">c</span>(<span class="at">size0  =</span> size0,</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">sigma0 =</span> sigma0,</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">pm     =</span> pm,</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">p0     =</span> p0,</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">p1     =</span> p1,</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">k0     =</span> k0,</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">k1     =</span> k1,</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">alpha  =</span> alpha,</span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">mu     =</span> mu,</span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">eps    =</span> eps))</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Solving one example:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">300</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> <span class="fl">2.5</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>sigma0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>k0 <span class="ot">&lt;-</span> <span class="dv">10</span></span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>k1 <span class="ot">&lt;-</span> .<span class="dv">1</span></span>
@@ -323,11 +327,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>eps <span class="ot">&lt;-</span> .<span class="dv">01</span></span>
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">integrodiffsim</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">simulator</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>A first visualization:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, <span class="fu">image</span>(x, <span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), BB[, <span class="sc">-</span><span class="dv">1</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, <span class="fu">image</span>(x, <span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), bact_pop[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">bty =</span> <span class="st">"o"</span>,</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlab =</span> <span class="st">"level of resistance"</span>, <span class="at">ylab =</span> <span class="st">"log10(time)"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -338,7 +343,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>A second visualization:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, <span class="fu">persp</span>(x, <span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), BB[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">col =</span> <span class="dv">4</span>, <span class="at">border =</span> <span class="cn">NA</span>, <span class="at">shade =</span> <span class="cn">TRUE</span>,</span>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, <span class="fu">persp</span>(x, <span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), bact_pop[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">col =</span> <span class="dv">4</span>, <span class="at">border =</span> <span class="cn">NA</span>, <span class="at">shade =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">theta =</span> <span class="sc">-</span><span class="dv">45</span>, <span class="at">phi =</span> <span class="dv">15</span>, <span class="at">r =</span> <span class="dv">10</span> <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="dv">3</span>), <span class="at">expand =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">3</span>, <span class="at">box =</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -350,7 +355,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>A third visualization:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, plot3D<span class="sc">::</span><span class="fu">persp3D</span>(x, <span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), BB[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">theta =</span> <span class="sc">-</span><span class="dv">45</span>, <span class="at">phi =</span> <span class="dv">15</span>,</span>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, plot3D<span class="sc">::</span><span class="fu">persp3D</span>(x, <span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), bact_pop[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">theta =</span> <span class="sc">-</span><span class="dv">45</span>, <span class="at">phi =</span> <span class="dv">15</span>,</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">r =</span> <span class="dv">10</span> <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="dv">3</span>), <span class="at">expand =</span> .<span class="dv">6</span>, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">shade =</span> <span class="dv">1</span>,</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">image =</span> <span class="cn">TRUE</span>, <span class="at">zlim =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, .<span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -364,10 +369,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>A fourth visualization:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rgl::open3d()</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># rgl::persp3d(x, log10(time[-1]), out[, -1])</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with(out, rgl::persp3d(x, log10(time[-1]), bact_pop[, -1]))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, <span class="fu">plotl</span>(<span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">log10</span>(TP[<span class="sc">-</span><span class="dv">1</span>]),</span>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, <span class="fu">plotl</span>(<span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">log10</span>(pop_size[<span class="sc">-</span><span class="dv">1</span>]), <span class="at">xaxs =</span> <span class="st">"i"</span>,</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlab =</span> <span class="st">"log10(time)"</span>, <span class="at">ylab =</span> <span class="st">"log10(population size)"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
@@ -379,11 +384,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>mean_resistance <span class="ot">&lt;-</span> <span class="cf">function</span>(out) {</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(out, BB <span class="sc">|&gt;</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(out, bact_pop <span class="sc">|&gt;</span> </span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>         purrr<span class="sc">::</span><span class="fu">map</span>(magrittr<span class="sc">::</span>multiply_by, x) <span class="sc">|&gt;</span> </span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>         purrr<span class="sc">::</span><span class="fu">map_dbl</span>(sum) <span class="sc">|&gt;</span> </span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>         magrittr<span class="sc">::</span><span class="fu">divide_by</span>(TP))</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>         magrittr<span class="sc">::</span><span class="fu">divide_by</span>(pop_size))</span>
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">

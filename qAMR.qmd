@@ -2,7 +2,11 @@
 title: "Quantitative AMR"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
+
+
 
 ## Packages
 
@@ -45,6 +49,7 @@ rect2 <- function(...) rect(..., border = NA)
 ```{r}
 seq2 <- function(...) seq(..., le = 512)
 ```
+
 
 ## A bimodal distribution
 
@@ -172,80 +177,41 @@ axis(1); axis(2)
 A function that numerically integrates the integro-differential equation of the model:
 
 ```{r}
-integrodiffsim <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {
+simulator <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {
+  dt <- diff(time)
   dx <- mean(diff(x))
-  dt <- mean(diff(time))
-  
-  ps <- p(x, pm, p0, p1)
-  ks <- k(x, k0, k1)
-  
-  bb <- size0 * dnorm(x, 0, sigma0)
-  BB <- list(bb)
-  tp <- TP <- sum(bb)
-  
-  for (t in tail(time, -1)) {
-    LI <- purrr::map_dbl(x, ~ sum(dnorm(.x - x, 0, eps) * ps * bb)) * dx / (1 + tp)^alpha
-    bb <- (bb + dt * LI) / (1 + dt * (mu + ks))
-    BB <- c(BB, list(bb))
-    tp <- sum(bb)
-    TP <- c(TP, tp)
-  }
-  
-  list(BB = as.matrix(as.data.frame(BB)), TP = TP, x = x, time = time,
-       param = c(size0  = size0,
-                 sigma0 = sigma0,
-                 pm     = pm,
-                 p0     = p0,
-                 p1     = p1,
-                 k0     = k0,
-                 k1     = k1,
-                 alpha  = alpha,
-                 mu     = mu,
-                 eps    = eps))
-}
-```
-
-```{r}
-dnorm2 <- function(x, mean, sd) {
-  exp(-(x - mean)^2 / (2 * sigma^2)) / sqrt(2 * pi * sigma^2)
-}
-```
-
-```{r}
-integrodiffsim2 <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {
-  dx <- mean(diff(x))
-  dt <- mean(diff(time))
-  
-  ps <- p(x, pm, p0, p1)
-  ks <- k(x, k0, k1)
-  
-  bb <- size0 * dnorm(x, 0, sigma0)
-  BB <- list(bb)
-  tp <- TP <- sum(bb)
-  
   A <- 2 * eps^2
-  B <- sqrt(2 * pi * eps^2)
-  J <- function(x) exp(-x^2 / A) / B
+  B <- sqrt(pi * A)
   
-  for (t in tail(time, -1)) {
-    LI <- purrr::map_dbl(x, ~ sum(J(.x - x) * ps * bb)) * dx / (1 + tp)^alpha
-    bb <- (bb + dt * LI) / (1 + dt * (mu + ks))
-    BB <- c(BB, list(bb))
-    tp <- sum(bb)
-    TP <- c(TP, tp)
+  ps <- p(x, pm, p0, p1)
+  
+  ks <- k(x, k0, k1)
+  J <- purrr::map(x, ~ exp(-(.x - x)^2 / A) / B)
+  
+  distribution <- dnorm(x, 0, sigma0)
+  mr_bact_pop <- size0 * distribution / sum(distribution)
+  bact_pop <- list(mr_bact_pop)
+  mr_pop_size <- pop_size <- sum(mr_bact_pop)
+  
+  for (dt_val in dt) {
+    L <- purrr::map_dbl(J, ~ sum(.x * ps * mr_bact_pop)) * dx / (1 + mr_pop_size)^alpha
+    mr_bact_pop <- (mr_bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
+    bact_pop <- c(bact_pop, list(mr_bact_pop))
+    mr_pop_size <- sum(mr_bact_pop)
+    pop_size <- c(pop_size, mr_pop_size)
   }
   
-  list(BB = as.matrix(as.data.frame(BB)), TP = TP, x = x, time = time,
-       param = c(size0  = size0,
-                 sigma0 = sigma0,
-                 pm     = pm,
-                 p0     = p0,
-                 p1     = p1,
-                 k0     = k0,
-                 k1     = k1,
-                 alpha  = alpha,
-                 mu     = mu,
-                 eps    = eps))
+  list(bact_pop = as.matrix(as.data.frame(bact_pop)), pop_size = pop_size,
+       x = x, time = time, param = c(size0  = size0,
+                                     sigma0 = sigma0,
+                                     pm     = pm,
+                                     p0     = p0,
+                                     p1     = p1,
+                                     k0     = k0,
+                                     k1     = k1,
+                                     alpha  = alpha,
+                                     mu     = mu,
+                                     eps    = eps))
 }
 ```
 
@@ -253,8 +219,8 @@ Solving one example:
 
 ```{r}
 x <- seq2(-.5, 1.5)
-time <- seq2(0, 300)
-size0 <- .05
+time <- seq(0, 300, .1)
+size0 <- 2.5
 sigma0 <- .05
 k0 <- 10
 k1 <- .1
@@ -265,49 +231,27 @@ mu <- .95
 alpha <- 1
 eps <- .01
 
-out <- integrodiffsim(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
+out <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
 ```
-
-Benchmarking:
-
-```{r}
-x <- seq2(-.5, 1.5)
-time <- seq2(0, 300)
-size0 <- .05
-sigma0 <- .05
-k0 <- 10
-k1 <- .1
-pm <- 10
-p0 <- 9.5
-p1 <- 4.75
-mu <- .95
-alpha <- 1
-eps <- .01
-
-bench::mark(
-  integrodiffsim(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time),
-  integrodiffsim2(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time))
-```
-
 
 A first visualization:
 
 ```{r}
-with(out, image(x, log10(time[-1]), BB[, -1]), xlab = "log10(time)")
-box(bty = "o")
+with(out, image(x, log10(time[-1]), bact_pop[, -1], bty = "o",
+                xlab = "level of resistance", ylab = "log10(time)"))
 ```
 
 A second visualization:
 
 ```{r}
-with(out, persp(x, log10(time[-1]), BB[, -1], col = 4, border = NA, shade = TRUE,
+with(out, persp(x, log10(time[-1]), bact_pop[, -1], col = 4, border = NA, shade = TRUE,
                 theta = -45, phi = 15, r = 10 * sqrt(3), expand = 1 / 3, box = FALSE))
 ```
 
 A third visualization:
 
 ```{r}
-with(out, plot3D::persp3D(x, log10(time[-1]), BB[, -1], theta = -45, phi = 15,
+with(out, plot3D::persp3D(x, log10(time[-1]), bact_pop[, -1], theta = -45, phi = 15,
                           r = 10 * sqrt(3), expand = .6, box = FALSE, shade = 1,
                           alpha = 1, image = TRUE, zlim = c(-.1, .1)))
 ```
@@ -316,21 +260,21 @@ A fourth visualization:
 
 ```{r}
 # rgl::open3d()
-# rgl::persp3d(x, log10(time[-1]), out[, -1])
+# with(out, rgl::persp3d(x, log10(time[-1]), bact_pop[, -1]))
 ```
 
 ```{r}
-with(out, plotl(log10(time[-1]), log10(TP[-1]),
+with(out, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i",
                 xlab = "log10(time)", ylab = "log10(population size)"))
 ```
 
 ```{r}
 mean_resistance <- function(out) {
-  with(out, BB |> 
+  with(out, bact_pop |> 
          as.data.frame() |> 
          purrr::map(magrittr::multiply_by, x) |> 
          purrr::map_dbl(sum) |> 
-         magrittr::divide_by(TP))
+         magrittr::divide_by(pop_size))
 }
 ```
 
@@ -338,3 +282,92 @@ mean_resistance <- function(out) {
 plotl(log10(out$time[-1]), mean_resistance(out)[-1],
       xlab = "log10(time)", ylab = "mean level of resistance")
 ```
+
+## Treatment outpout
+
+
+```{r}
+cb <- function(p, k, mu) {
+  k * pm / ((mu + k) * (pm - p))
+}
+```
+
+```{r}
+k_mu <- function(cb, pm, mu) {
+  gamma <- pm * (1 - cb) / 2 - mu
+  (gamma + sqrt(gamma^2 + mu * (pm - mu))) / mu
+}
+```
+
+```{r}
+veps <- .001
+mu_val <- seq(veps, 1000, veps)
+# cb0 <- cb(p0, k0, mu_val)
+p02 <- 7
+cb0 <- cb(p02, k0, mu_val)
+cb1 <- cb(p1, k1, mu_val)
+
+cb_val <- seq2(0, 25)
+k_mu_val <- k_mu(cb_val, pm, mu)
+
+plotl(NA, xlim = c(0, 4), ylim = c(0, 3), xaxs = "i", yaxs = "i")
+
+rect(0, 0, 5, 4, col = colS)
+polygon(c(0, cb0, 0), c(3, k0 / mu_val, 3), col = colI)
+#polygon(c(0, min(cb1), cb1, 0), c(3, 0, k1 / mu_val, 3), col = colR)
+#polygon(c(4, rev(cb_val), 4), c(3, rev(k_mu_val), 3), col = "grey")
+
+lines2(cb0, k0 / mu_val, col = 3)
+lines2(cb1, k1 / mu_val, col = 2)
+# abline(v = 1 / c(1 - p1 / pm, 1 - p0 / pm))
+abline(v = 1 / c(1 - p1 / pm, 1 - p02 / pm), col = 2:3)
+lines(cb_val, k_mu_val, lwd = 4)
+```
+
+```{r}
+plot(NA, xlim = c(0, 4), ylim = c(0, 3), xaxs = "i", yaxs = "i")
+
+rect(0, 0, 5, 4, col = colS)
+polygon(c(0, 0, cb0, 0), c(3, 0, k0 / mu_val, 3), col = 2)
+#polygon(c(0, min(cb1), cb1, 0), c(3, 0, k1 / mu_val, 3), col = colR)
+#polygon(c(4, rev(cb_val), 4), c(3, rev(k_mu_val), 3), col = "grey")
+
+lines2(cb0, k0 / mu_val, col = 3)
+lines2(cb1, k1 / mu_val, col = 2)
+# abline(v = 1 / c(1 - p1 / pm, 1 - p0 / pm))
+abline(v = 1 / c(1 - p1 / pm, 1 - p02 / pm), col = 2:3)
+lines(cb_val, k_mu_val, lwd = 4)
+```
+
+
+
+```{r}
+h_S <- function(cb, p0, pm, mu) {
+  mu / (1 / (1 - p0 / pm) - cb)
+}
+```
+
+```{r}
+h_R <- function(cb, k0, k1, p1, pm, mu) {
+  mu * k0 / ((1 / (1 - p1 / pm) - cb) * k1)
+}
+```
+
+```{r}
+h_S0 <- function(cb, p0, pm, mu) {
+  mu * (((1 - p0 / pm)^-1) - cb)^-1
+}
+```
+
+```{r}
+h_R0 <- function(cb, k0, k1, p1, pm, mu) {
+  (mu * k0 * (((1 - p1 / pm)^-1) - cb)^-1) / k1
+}
+```
+
+```{r}
+cb_val <- seq2(0, 20)
+h_R_val <- h_R0(cb_val, k0, k1, p1, pm, mu)
+plotl(cb_val, h_S_val)
+```
+
