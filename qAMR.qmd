@@ -6,12 +6,16 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r include = FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+```
 
 
 ## Packages
 
 ```{r}
-needed_packages <- c("magrittr",
+needed_packages <- c("dplyr",
+                     "magrittr",
                      "plot3D",
                      "purrr",
                      "rgl")
@@ -20,13 +24,32 @@ to_install <- needed_packages[! needed_packages %in% installed.packages()[,"Pack
 if (length(to_install)) install.packages(to_install)
 ```
 
+```{r}
+library(dplyr)
+library(purrr)
+```
 
 ## Functions
 
 ```{r}
-polygon2 <- function(x, y, col = 4, alpha = .2, ...) {
-  polygon(c(x[1], x, tail(x, 1)), c(0, y, 0), col = adjustcolor(col, alpha),
-          border = NA)
+polygon2 <- function(...) polygon(..., border = NA)
+```
+
+```{r}
+polygon3 <- function(x, y, col = 4, alpha = .2, ...) {
+  polygon2(c(x[1], x, tail(x, 1)), c(0, y, 0), col = adjustcolor(col, alpha))
+}
+```
+
+```{r}
+polygon4 <- function(x, y, ...) {
+  polygon2(c(x[1], x), c(tail(y, 1), y), ...)
+}
+```
+
+```{r}
+polygon5 <- function(x, y, ...) {
+  polygon2(c(tail(x, 1), x), c(y[1], y), ...)
 }
 ```
 
@@ -58,8 +81,8 @@ x <- seq(0, 10, le = 512)
 y1 <- dnorm(x, 2.5, .8)
 y2 <- dnorm(x,7, .5)
 plot(x, y1, type = "n")
-polygon2(x, y1)
-polygon2(x, .25 * y2)
+polygon3(x, y1)
+polygon3(x, .25 * y2)
 ```
 
 
@@ -215,7 +238,7 @@ simulator <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time
 }
 ```
 
-Solving one example:
+Solving one example (takes 7"):
 
 ```{r}
 x <- seq2(-.5, 1.5)
@@ -234,21 +257,21 @@ eps <- .01
 out <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
 ```
 
-A first visualization:
+A first visualization (takes 3"):
 
 ```{r}
 with(out, image(x, log10(time[-1]), bact_pop[, -1], bty = "o",
                 xlab = "level of resistance", ylab = "log10(time)"))
 ```
 
-A second visualization:
+A second visualization (takes 5"):
 
 ```{r}
 with(out, persp(x, log10(time[-1]), bact_pop[, -1], col = 4, border = NA, shade = TRUE,
                 theta = -45, phi = 15, r = 10 * sqrt(3), expand = 1 / 3, box = FALSE))
 ```
 
-A third visualization:
+A third visualization (takes 26"):
 
 ```{r}
 with(out, plot3D::persp3D(x, log10(time[-1]), bact_pop[, -1], theta = -45, phi = 15,
@@ -283,8 +306,8 @@ plotl(log10(out$time[-1]), mean_resistance(out)[-1],
       xlab = "log10(time)", ylab = "mean level of resistance")
 ```
 
-## Treatment outpout
 
+## Treatment outpout
 
 ```{r}
 cb <- function(p, k, mu) {
@@ -300,74 +323,63 @@ k_mu <- function(cb, pm, mu) {
 ```
 
 ```{r}
-veps <- .001
-mu_val <- seq(veps, 1000, veps)
-# cb0 <- cb(p0, k0, mu_val)
+# p02 <- p0
 p02 <- 7
+cb_max <- 4
+veps <- .001
+
+mu_val <- seq(veps, 1000, veps)
+cb_val <- seq2(0, 25)
 cb0 <- cb(p02, k0, mu_val)
 cb1 <- cb(p1, k1, mu_val)
+y0 <- c(0, k0 / mu_val)
+y1 <- c(0, k1 / mu_val)
+cb0 <- c(0, cb0)
+cb1 <- c(0, cb1)
 
-cb_val <- seq2(0, 25)
-k_mu_val <- k_mu(cb_val, pm, mu)
+cbs <- seq2(0, cb_max)
 
-plotl(NA, xlim = c(0, 4), ylim = c(0, 3), xaxs = "i", yaxs = "i")
+line_green <- data.frame(x = cbs, y = approx(cb0, y0, cbs)$y) |> 
+  na.exclude() |> 
+  arrange(x)
 
-rect(0, 0, 5, 4, col = colS)
-polygon(c(0, cb0, 0), c(3, k0 / mu_val, 3), col = colI)
-#polygon(c(0, min(cb1), cb1, 0), c(3, 0, k1 / mu_val, 3), col = colR)
-#polygon(c(4, rev(cb_val), 4), c(3, rev(k_mu_val), 3), col = "grey")
+line_red <- data.frame(x = cbs, y = approx(cb1, y1, cbs)$y) |> 
+  na.exclude() |> 
+  arrange(x)
 
-lines2(cb0, k0 / mu_val, col = 3)
-lines2(cb1, k1 / mu_val, col = 2)
-# abline(v = 1 / c(1 - p1 / pm, 1 - p0 / pm))
+line_black <- data.frame(x = cbs, y = approx(cb_val, k_mu(cb_val, pm, mu), cbs)$y) |> 
+  na.exclude() |> 
+  arrange(x)
+
+Xintersect <- function(df) {
+  df |>
+    left_join(line_black, by = "x") |> 
+    filter(y.x > y.y) |> 
+    pull(x) |>
+    head(1)
+}
+
+Xintersect0 <- Xintersect(line_green)
+Xintersect1 <- Xintersect(line_red)
+
+#######################################################################################
+
+plot(NA, xlim = c(0, 4), ylim = c(0, 3), xaxs = "i", yaxs = "i", bty = "o",
+     xlab = "cost / benefit of resistance", ylab = "drug efficacy")
+
+full_join(line_black, line_green, by = "x") |>
+  mutate(y = map2_dbl(y.x, y.y, min, na.rm = TRUE)) |> 
+  with(polygon3(x, y, col = colS, alpha = 1))
+polygon(c(line_green$x, rev(line_red$x)), c(line_green$y, rev(line_red$y)), col = colI,
+        border = NA)
+with(line_red, polygon4(x, y, col = colR))
+with(line_black, polygon5(x, y, col = "lightgrey"))
+
+with(filter(line_red, x < Xintersect1), lines2(x, y))
+with(filter(line_red, x > Xintersect1), lines2(x, y, lty = 3))
+with(filter(line_green, x < Xintersect0), lines2(x, y, col = 3))
+with(filter(line_green, x > Xintersect0), lines2(x, y, col = 3, lty = 3))
 abline(v = 1 / c(1 - p1 / pm, 1 - p02 / pm), col = 2:3)
-lines(cb_val, k_mu_val, lwd = 4)
-```
-
-```{r}
-plot(NA, xlim = c(0, 4), ylim = c(0, 3), xaxs = "i", yaxs = "i")
-
-rect(0, 0, 5, 4, col = colS)
-polygon(c(0, 0, cb0, 0), c(3, 0, k0 / mu_val, 3), col = 2)
-#polygon(c(0, min(cb1), cb1, 0), c(3, 0, k1 / mu_val, 3), col = colR)
-#polygon(c(4, rev(cb_val), 4), c(3, rev(k_mu_val), 3), col = "grey")
-
-lines2(cb0, k0 / mu_val, col = 3)
-lines2(cb1, k1 / mu_val, col = 2)
-# abline(v = 1 / c(1 - p1 / pm, 1 - p0 / pm))
-abline(v = 1 / c(1 - p1 / pm, 1 - p02 / pm), col = 2:3)
-lines(cb_val, k_mu_val, lwd = 4)
-```
-
-
-
-```{r}
-h_S <- function(cb, p0, pm, mu) {
-  mu / (1 / (1 - p0 / pm) - cb)
-}
-```
-
-```{r}
-h_R <- function(cb, k0, k1, p1, pm, mu) {
-  mu * k0 / ((1 / (1 - p1 / pm) - cb) * k1)
-}
-```
-
-```{r}
-h_S0 <- function(cb, p0, pm, mu) {
-  mu * (((1 - p0 / pm)^-1) - cb)^-1
-}
-```
-
-```{r}
-h_R0 <- function(cb, k0, k1, p1, pm, mu) {
-  (mu * k0 * (((1 - p1 / pm)^-1) - cb)^-1) / k1
-}
-```
-
-```{r}
-cb_val <- seq2(0, 20)
-h_R_val <- h_R0(cb_val, k0, k1, p1, pm, mu)
-plotl(cb_val, h_S_val)
+with(line_black, lines2(x, y, col = 1))
 ```
 
