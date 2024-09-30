@@ -383,3 +383,67 @@ abline(v = 1 / c(1 - p1 / pm, 1 - p02 / pm), col = 2:3)
 with(line_black, lines2(x, y, col = 1))
 ```
 
+## Exploring the effect of speed of evolution
+
+```{r}
+x <- seq2(-.5, 1.5)
+time <- seq(0, 300, .1)
+size0 <- 2.5
+sigma0 <- .05
+k0 <- 10
+k1 <- .1
+pm <- 10
+p0 <- 9.5
+p1 <- 4.75
+mu <- .95
+alpha <- 1
+eps <- .01
+
+out <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
+
+with(out, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i",
+                xlab = "log10(time)", ylab = "log10(population size)"))
+
+plotl(log10(out$time[-1]), mean_resistance(out)[-1],
+      xlab = "log10(time)", ylab = "mean level of resistance")
+```
+
+```{r}
+out2 <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps = .001, x, time)
+
+with(out2, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i",
+                xlab = "log10(time)", ylab = "log10(population size)"))
+
+plotl(log10(out2$time[-1]), mean_resistance(out2)[-1],
+      xlab = "log10(time)", ylab = "mean level of resistance")
+```
+
+```{r}
+out3 <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps = .1, x, time)
+```
+
+
+```{r}
+with(out, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i", ylim = c(-.8, 1),
+                xlab = "log10(time)", ylab = "log10(population size)"))
+
+with(out2, lines2(log10(time[-1]), log10(pop_size[-1])))
+with(out3, lines2(log10(time[-1]), log10(pop_size[-1]), col = 3))
+```
+
+```{r}
+out4 <- simulator(size0, sigma0, pm, p0, p1, 2 * k0, 2 * k1, alpha, mu, eps = .1, x, time)
+```
+
+```{r}
+with(out4, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i", ylim = c(-.9, 1),
+                xlab = "log10(time)", ylab = "log10(population size)"))
+with(out3, lines2(log10(time[-1]), log10(pop_size[-1]), col = 3))
+```
+
+```{r}
+out5 <- simulator(size0, sigma0, pm, p0, p1, 50 * k0, 50 * k1, alpha, mu, eps = .0000001, x, time)
+with(out5, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i", ylim = c(-.9, 1),
+                xlab = "log10(time)", ylab = "log10(population size)"))
+```
+
