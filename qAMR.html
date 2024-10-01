@@ -68,6 +68,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="qAMR_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="qAMR_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -98,6 +127,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="packages" class="level2">
 <h2 class="anchored" data-anchor-id="packages">Packages</h2>
+<p>Installing packages:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>needed_packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"dplyr"</span>,</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"magrittr"</span>,</span>
@@ -108,74 +138,83 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>to_install <span class="ot">&lt;-</span> needed_packages[<span class="sc">!</span> needed_packages <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[,<span class="st">"Package"</span>]]</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(to_install)) <span class="fu">install.packages</span>(to_install)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Loading packages:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="functions" class="level2">
 <h2 class="anchored" data-anchor-id="functions">Functions</h2>
+<p>A few utility functions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>polygon2 <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">polygon</span>(..., <span class="at">border =</span> <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>polygon2 <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">polygon</span>(..., <span class="at">border =</span> <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>polygon3 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">alpha =</span> .<span class="dv">2</span>, ...) {</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon2</span>(<span class="fu">c</span>(x[<span class="dv">1</span>], x, <span class="fu">tail</span>(x, <span class="dv">1</span>)), <span class="fu">c</span>(<span class="dv">0</span>, y, <span class="dv">0</span>), <span class="at">col =</span> <span class="fu">adjustcolor</span>(col, alpha))</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>polygon3 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, <span class="at">col =</span> <span class="dv">4</span>, <span class="at">alpha =</span> .<span class="dv">2</span>, ...) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon2</span>(<span class="fu">c</span>(x[<span class="dv">1</span>], x, <span class="fu">tail</span>(x, <span class="dv">1</span>)), <span class="fu">c</span>(<span class="dv">0</span>, y, <span class="dv">0</span>), <span class="at">col =</span> <span class="fu">adjustcolor</span>(col, alpha))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>polygon4 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, ...) {</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon2</span>(<span class="fu">c</span>(x[<span class="dv">1</span>], x), <span class="fu">c</span>(<span class="fu">tail</span>(y, <span class="dv">1</span>), y), ...)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>polygon4 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, ...) <span class="fu">polygon2</span>(<span class="fu">c</span>(x[<span class="dv">1</span>], x), <span class="fu">c</span>(<span class="fu">tail</span>(y, <span class="dv">1</span>), y), ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>polygon5 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, ...) {</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon2</span>(<span class="fu">c</span>(<span class="fu">tail</span>(x, <span class="dv">1</span>), x), <span class="fu">c</span>(y[<span class="dv">1</span>], y), ...)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>polygon5 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, ...) <span class="fu">polygon2</span>(<span class="fu">c</span>(<span class="fu">tail</span>(x, <span class="dv">1</span>), x), <span class="fu">c</span>(y[<span class="dv">1</span>], y), ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>plotl <span class="ot">&lt;-</span> <span class="cf">function</span>(..., <span class="at">lwd =</span> <span class="dv">4</span>, <span class="at">col =</span> <span class="dv">4</span>) <span class="fu">plot</span>(..., <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> lwd, <span class="at">col =</span> col)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plotl <span class="ot">&lt;-</span> <span class="cf">function</span>(..., <span class="at">lwd =</span> <span class="dv">4</span>, <span class="at">col =</span> <span class="dv">4</span>) <span class="fu">plot</span>(..., <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> lwd, <span class="at">col =</span> col)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>lines2 <span class="ot">&lt;-</span> <span class="cf">function</span>(..., <span class="at">lwd =</span> <span class="dv">4</span>, <span class="at">col =</span> <span class="dv">2</span>) <span class="fu">lines</span>(..., <span class="at">lwd =</span> lwd, <span class="at">col =</span> col)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>lines2 <span class="ot">&lt;-</span> <span class="cf">function</span>(..., <span class="at">lwd =</span> <span class="dv">4</span>, <span class="at">col =</span> <span class="dv">2</span>) <span class="fu">lines</span>(..., <span class="at">lwd =</span> lwd, <span class="at">col =</span> col)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>rgb2 <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">rgb</span>(..., <span class="at">alpha =</span> <span class="dv">255</span> <span class="sc">/</span> <span class="dv">3</span>, <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rgb2 <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">rgb</span>(..., <span class="at">alpha =</span> <span class="dv">255</span> <span class="sc">/</span> <span class="dv">3</span>, <span class="at">maxColorValue =</span> <span class="dv">255</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>rect2 <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">rect</span>(..., <span class="at">border =</span> <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>rect2 <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">rect</span>(..., <span class="at">border =</span> <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>seq2 <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">seq</span>(..., <span class="at">le =</span> <span class="dv">512</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>seq2 <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">seq</span>(..., <span class="at">le =</span> <span class="dv">512</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>as_transposed_dataframe <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">as.data.frame</span>(<span class="fu">t</span>(<span class="fu">as.data.frame</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>log10Tck <span class="ot">&lt;-</span> <span class="cf">function</span>(side, type) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>   lim <span class="ot">&lt;-</span> <span class="cf">switch</span>(side, </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">x =</span> <span class="fu">par</span>(<span class="st">"usr"</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>],</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y =</span> <span class="fu">par</span>(<span class="st">"usr"</span>)[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>],</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">stop</span>(<span class="st">"side argument must be 'x' or 'y'"</span>))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>   at <span class="ot">&lt;-</span> <span class="fu">floor</span>(lim[<span class="dv">1</span>])<span class="sc">:</span><span class="fu">ceiling</span>(lim[<span class="dv">2</span>])</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>   <span class="cf">switch</span>(type,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">minor =</span> <span class="fu">outer</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="dv">10</span><span class="sc">^</span>(<span class="fu">min</span>(at)<span class="sc">:</span><span class="fu">max</span>(at))),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">major =</span> <span class="dv">10</span><span class="sc">^</span>at,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>          <span class="fu">stop</span>(<span class="st">"type argument must be 'major' or 'minor'"</span>))</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>add_ticks <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  at1 <span class="ot">&lt;-</span> <span class="fu">log10Tck</span>(<span class="st">"x"</span>, <span class="st">"major"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  at2 <span class="ot">&lt;-</span> <span class="fu">log10Tck</span>(<span class="st">"x"</span>, <span class="st">"minor"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>, <span class="fu">log10</span>(at1), at1, <span class="at">tcl =</span> <span class="sc">-</span>.<span class="dv">5</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>, <span class="fu">log10</span>(at2), <span class="cn">NA</span>, <span class="at">tcl =</span> <span class="sc">-</span>.<span class="dv">25</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">2</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="a-bimodal-distribution" class="level2">
 <h2 class="anchored" data-anchor-id="a-bimodal-distribution">A bimodal distribution</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">le =</span> <span class="dv">512</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="fl">2.5</span>, .<span class="dv">8</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>y2 <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x,<span class="dv">7</span>, .<span class="dv">5</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, y1, <span class="at">type =</span> <span class="st">"n"</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3</span>(x, y1)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3</span>(x, .<span class="dv">25</span> <span class="sc">*</span> y2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="fl">2.5</span>, .<span class="dv">8</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>y2 <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="dv">7</span>, .<span class="dv">5</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, y1, <span class="at">type =</span> <span class="st">"n"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3</span>(x, y1)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3</span>(x, .<span class="dv">25</span> <span class="sc">*</span> y2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -183,34 +222,15 @@ Attaching package: 'dplyr'</code></pre>
 </section>
 <section id="a-scale-free-metric-of-resistance" class="level2">
 <h2 class="anchored" data-anchor-id="a-scale-free-metric-of-resistance">A scale-free metric of resistance</h2>
+<p><span class="math display">\[
+x = \frac{\log\left(\frac{\rm MIC}{\rm C_0}\right)}{\log\left(\frac{\rm C_1}{\rm C_0}\right)}
+\]</span></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>C0 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>mic <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">le =</span> <span class="dv">512</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">log</span>(mic <span class="sc">/</span> C0) <span class="sc">/</span> <span class="fu">log</span>(C1 <span class="sc">/</span> C0)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mic, x, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">4</span>, <span class="at">col =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="the-mmnp-model" class="level2">
-<h2 class="anchored" data-anchor-id="the-mmnp-model">The MMNP model</h2>
-<p>The antimicrobial activity as a function of bacterial resistance:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="cf">function</span>(x, k0, k1) {</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">any</span>(<span class="fu">c</span>(k0, k1) <span class="sc">==</span> <span class="dv">0</span>)) <span class="fu">return</span>(<span class="dv">0</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  k0 <span class="sc">*</span> (k1 <span class="sc">/</span> k0)<span class="sc">^</span>x</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>An illustration:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">4</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(x, <span class="fu">k</span>(x, <span class="dv">5</span>, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>C0 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>mic <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">log</span>(mic <span class="sc">/</span> C0) <span class="sc">/</span> <span class="fu">log</span>(C1 <span class="sc">/</span> C0)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(mic, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -219,16 +239,28 @@ Attaching package: 'dplyr'</code></pre>
 </div>
 </div>
 </div>
-<p>The maximum bacterial growth rate as a function of bacterial resistance:</p>
+</section>
+<section id="the-mmnp-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-mmnp-model">The MMNP model</h2>
+<p><span class="math inline">\(b(t,y)\)</span> is the density of bacteria with resistance level <span class="math inline">\(y\)</span> at time <span class="math inline">\(t\)</span> and <span class="math inline">\(B(t) = \int_\mathbb{R} b(t,y)dy\)</span> is the total density of bacteria at time <span class="math inline">\(t\)</span>. The evolutionary dynamics is described by the following equation:</p>
+<p><span class="math display">\[
+\frac{\partial b}{\partial t} = \frac{1}{(1 + B(t))^\alpha}\int_\mathbb{R} J(x-y)p(y)b(t,y)dy - (\mu(x) + k(x))b(t,x)
+\]</span></p>
+<p>The antimicrobial activity as a function of bacterial resistance can be expressed as:</p>
+<p><span class="math display">\[
+k(x) = k_0\left(\frac{k_1}{k_0}\right)^x
+\]</span></p>
+<p>The corresponding R function reads:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="cf">function</span>(x, pm, p0, p1) {</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  pm <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> ((pm <span class="sc">-</span> p0) <span class="sc">/</span> p0) <span class="sc">*</span> (p0 <span class="sc">*</span> (pm <span class="sc">-</span> p1) <span class="sc">/</span> (p1 <span class="sc">*</span> (pm <span class="sc">-</span> p0)))<span class="sc">^</span>x)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="cf">function</span>(x, k0, k1) {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">any</span>(<span class="fu">c</span>(k0, k1) <span class="sc">==</span> <span class="dv">0</span>)) <span class="fu">return</span>(<span class="dv">0</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  k0 <span class="sc">*</span> (k1 <span class="sc">/</span> k0)<span class="sc">^</span>x</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>An illustration:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span><span class="dv">9</span>, <span class="dv">10</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(x, <span class="fu">p</span>(x, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">4</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(x, <span class="fu">k</span>(x, <span class="dv">5</span>, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -237,199 +269,291 @@ Attaching package: 'dplyr'</code></pre>
 </div>
 </div>
 </div>
-<p>The basic reproduction ratio:</p>
+<p>The maximum bacterial growth rate as a function of bacterial resistance:</p>
+<p><span class="math display">\[
+p(x) = \frac{p_m}{1 + \frac{p_m - p_0}{p_0}\left(\frac{p_0}{p_1}\frac{p_m - p_1}{p_m - p_0}\right)^x}
+\]</span></p>
+<p>The corresponding R function:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>R0 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">k0 =</span> <span class="dv">3</span>, <span class="at">k1 =</span> .<span class="dv">03</span>, <span class="at">pm =</span> <span class="dv">10</span>, <span class="at">p0 =</span> <span class="fl">9.5</span>, <span class="at">p1 =</span> <span class="fl">4.75</span>, <span class="at">mu =</span> .<span class="dv">9</span>) {</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(x, pm, p0, p1) <span class="sc">/</span> (mu <span class="sc">+</span> <span class="fu">k</span>(x, k0, k1))</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="cf">function</span>(x, pm, p0, p1) {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  pm <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> ((pm <span class="sc">-</span> p0) <span class="sc">/</span> p0) <span class="sc">*</span> (p0 <span class="sc">*</span> (pm <span class="sc">-</span> p1) <span class="sc">/</span> (p1 <span class="sc">*</span> (pm <span class="sc">-</span> p0)))<span class="sc">^</span>x)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>A function that looks for the ESS:</p>
+<p>An illustration:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>R_evol_level <span class="ot">&lt;-</span> <span class="cf">function</span>(k0, k1, p1, p0, pm, mu, <span class="at">interval =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>), ...) {</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  Delta <span class="ot">&lt;-</span> p0 <span class="sc">*</span> (pm <span class="sc">-</span> p1) <span class="sc">/</span> (p1 <span class="sc">*</span> (pm <span class="sc">-</span> p0))</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  Delta2 <span class="ot">&lt;-</span> pm <span class="sc">/</span> p0 <span class="sc">-</span> <span class="dv">1</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  theta2 <span class="ot">&lt;-</span> k1 <span class="sc">/</span> k0</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  derivative <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">abs</span>(<span class="fu">log</span>(k0 <span class="sc">/</span> k1) <span class="sc">*</span> k0 <span class="sc">*</span> theta2<span class="sc">^</span>x <span class="sc">/</span> (mu <span class="sc">+</span> k0 <span class="sc">*</span> theta2<span class="sc">^</span>x) <span class="sc">-</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>          Delta2 <span class="sc">*</span> <span class="fu">log</span>(Delta) <span class="sc">*</span> Delta<span class="sc">^</span>x <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> Delta2 <span class="sc">*</span> Delta<span class="sc">^</span>x))</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">optimize</span>(derivative, <span class="at">interval =</span> interval, ...)<span class="sc">$</span>minimum</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Plot of R0:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>, <span class="at">le =</span> <span class="dv">512</span>)</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>k0 <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>k1 <span class="ot">&lt;-</span> .<span class="dv">1</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>pm <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fl">9.5</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fl">4.75</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> .<span class="dv">95</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>R0_drug <span class="ot">&lt;-</span> <span class="fu">R0</span>(x, k0, k1, pm, p0, p1, mu)</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>R0_nodrug <span class="ot">&lt;-</span> <span class="fu">R0</span>(x, <span class="dv">0</span>, <span class="dv">0</span>, pm, p0, p1, mu)</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>xStar <span class="ot">&lt;-</span> <span class="fu">R_evol_level</span>(k0, k1, p1, p0, pm, mu)</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>R0max <span class="ot">&lt;-</span> <span class="fu">max</span>(R0_drug)</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>xmin <span class="ot">&lt;-</span> <span class="fu">min</span>(x)</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>xmax <span class="ot">&lt;-</span> <span class="fu">max</span>(x)</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>ymax <span class="ot">&lt;-</span> <span class="fu">max</span>(R0_nodrug)</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>colS <span class="ot">&lt;-</span> <span class="fu">rgb2</span>(<span class="dv">8</span>, <span class="dv">146</span>, <span class="dv">6</span>)</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>colI <span class="ot">&lt;-</span> <span class="fu">rgb2</span>(<span class="dv">255</span>, <span class="dv">147</span>, <span class="dv">1</span>)</span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>colR <span class="ot">&lt;-</span> <span class="fu">rgb2</span>(<span class="dv">255</span>, <span class="dv">63</span>, <span class="dv">30</span>)</span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, R0_nodrug, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, ymax), <span class="at">type =</span> <span class="st">"n"</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"level of resistance"</span>, <span class="at">ylab =</span> <span class="st">"R0"</span>)</span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(xmin, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, ymax, <span class="at">col =</span> colS)</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, ymax, <span class="at">col =</span> colI)</span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, xmax, ymax, <span class="at">col =</span> colR)</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a><span class="fu">lines2</span>(x, R0_drug)</span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a><span class="fu">lines2</span>(x, R0_nodrug, <span class="at">col =</span> <span class="dv">4</span>)</span>
-<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a><span class="fu">segments</span>(xStar, <span class="sc">-</span><span class="dv">1</span>, xStar, R0max, <span class="at">col =</span> <span class="dv">2</span>)</span>
-<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a><span class="fu">segments</span>(<span class="sc">-</span><span class="dv">1</span>, R0max, xStar, R0max, <span class="at">col =</span> <span class="dv">2</span>)</span>
-<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(xStar, R0max, <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="dv">2</span>)</span>
-<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">min</span>(x), <span class="fu">max</span>(R0_nodrug), <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="dv">4</span>)</span>
-<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">1</span>); <span class="fu">axis</span>(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span><span class="dv">9</span>, <span class="dv">10</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(x, <span class="fu">p</span>(x, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The basic reproduction ratio:</p>
+<p><span class="math display">\[
+\mathcal{R}_0(x) = \frac{p(x)}{\mu(x) + k(x)}
+\]</span></p>
+<p>The corresponding R function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>R0 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">k0 =</span> <span class="dv">3</span>, <span class="at">k1 =</span> .<span class="dv">03</span>, <span class="at">pm =</span> <span class="dv">10</span>, <span class="at">p0 =</span> <span class="fl">9.5</span>, <span class="at">p1 =</span> <span class="fl">4.75</span>, <span class="at">mu =</span> .<span class="dv">9</span>) {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(x, pm, p0, p1) <span class="sc">/</span> (mu <span class="sc">+</span> <span class="fu">k</span>(x, k0, k1))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The invasion fitness of mutant <span class="math inline">\(y\)</span> in a resident population <span class="math inline">\(x\)</span>:</p>
+<p><span class="math display">\[
+f_x(y) = \frac{\mathcal{R}_0(y) - \mathcal{R}_0(x)}{\mathcal{R}_0(x)}
+\]</span></p>
+<p><span class="math display">\[
+\frac{d\mathcal{R}_0}{dx} = \frac{k_0\log(1 + \theta)}{\left(\mu + \frac{k_0}{(1 + \theta)^x}\right)(1 + \theta)^x} - \frac{\left(\frac{p_m}{p_0} - 1\right)\log(\Delta)\Delta^x}{1 + \left(\frac{p_m}{p_0} - 1\right)\Delta^x}
+\]</span> with</p>
+<p><span class="math display">\[
+\theta = \frac{k_0 - k_1}{k_1} &gt; 0
+\]</span></p>
+<p>where <span class="math inline">\(\theta = 0\)</span> means there is no fitness advantage provided by an increase in resistance level and</p>
+<p><span class="math display">\[
+\Delta = \frac{p_0}{p_1}\frac{p_m - p_1}{p_m - p_0} &gt; 1
+\]</span></p>
+<p>where <span class="math inline">\(\Delta = 1\)</span> means there is no cost of resistance.</p>
+<p>A function that looks for the ESS:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>R_evol_level <span class="ot">&lt;-</span> <span class="cf">function</span>(k0, k1, p1, p0, pm, mu, <span class="at">interval =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>), ...) {</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  Delta <span class="ot">&lt;-</span> p0 <span class="sc">*</span> (pm <span class="sc">-</span> p1) <span class="sc">/</span> (p1 <span class="sc">*</span> (pm <span class="sc">-</span> p0))</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  Delta2 <span class="ot">&lt;-</span> pm <span class="sc">/</span> p0 <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  theta2 <span class="ot">&lt;-</span> k1 <span class="sc">/</span> k0</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  derivative <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">abs</span>(<span class="fu">log</span>(k0 <span class="sc">/</span> k1) <span class="sc">*</span> k0 <span class="sc">*</span> theta2<span class="sc">^</span>x <span class="sc">/</span> (mu <span class="sc">+</span> k0 <span class="sc">*</span> theta2<span class="sc">^</span>x) <span class="sc">-</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>          Delta2 <span class="sc">*</span> <span class="fu">log</span>(Delta) <span class="sc">*</span> Delta<span class="sc">^</span>x <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> Delta2 <span class="sc">*</span> Delta<span class="sc">^</span>x))</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">optimize</span>(derivative, <span class="at">interval =</span> interval, ...)<span class="sc">$</span>minimum</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Plot of R0:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>k0 <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>k1 <span class="ot">&lt;-</span> .<span class="dv">1</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>pm <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fl">9.5</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fl">4.75</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> .<span class="dv">95</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>R0_drug <span class="ot">&lt;-</span> <span class="fu">R0</span>(x, k0, k1, pm, p0, p1, mu)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>R0_nodrug <span class="ot">&lt;-</span> <span class="fu">R0</span>(x, <span class="dv">0</span>, <span class="dv">0</span>, pm, p0, p1, mu)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>xStar <span class="ot">&lt;-</span> <span class="fu">R_evol_level</span>(k0, k1, p1, p0, pm, mu)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>R0max <span class="ot">&lt;-</span> <span class="fu">max</span>(R0_drug)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>xmin <span class="ot">&lt;-</span> <span class="fu">min</span>(x)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>xmax <span class="ot">&lt;-</span> <span class="fu">max</span>(x)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>ymax <span class="ot">&lt;-</span> <span class="fl">1.04</span> <span class="sc">*</span> <span class="fu">max</span>(R0_nodrug)</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>colS <span class="ot">&lt;-</span> <span class="fu">rgb2</span>(<span class="dv">8</span>, <span class="dv">146</span>, <span class="dv">6</span>)</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>colI <span class="ot">&lt;-</span> <span class="fu">rgb2</span>(<span class="dv">255</span>, <span class="dv">147</span>, <span class="dv">1</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>colR <span class="ot">&lt;-</span> <span class="fu">rgb2</span>(<span class="dv">255</span>, <span class="dv">63</span>, <span class="dv">30</span>)</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, R0_nodrug, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, ymax), <span class="at">type =</span> <span class="st">"n"</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>,</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"level of resistance"</span>, <span class="at">ylab =</span> <span class="st">"R0"</span>)</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(xmin, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, ymax, <span class="at">col =</span> colS)</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, ymax, <span class="at">col =</span> colI)</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, xmax, ymax, <span class="at">col =</span> colR)</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">4</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a><span class="fu">lines2</span>(x, R0_drug)</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a><span class="fu">lines2</span>(x, R0_nodrug, <span class="at">col =</span> <span class="dv">4</span>)</span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a><span class="fu">segments</span>(xStar, <span class="sc">-</span><span class="dv">1</span>, xStar, R0max, <span class="at">col =</span> <span class="dv">2</span>)</span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a><span class="fu">segments</span>(<span class="sc">-</span><span class="dv">1</span>, R0max, xStar, R0max, <span class="at">col =</span> <span class="dv">2</span>)</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(xStar, R0max, <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="dv">2</span>)</span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">min</span>(x), <span class="fu">max</span>(R0_nodrug), <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="dv">4</span>)</span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">1</span>); <span class="fu">axis</span>(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="qAMR_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>A function that numerically integrates the integro-differential equation of the model:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>simulator <span class="ot">&lt;-</span> <span class="cf">function</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  dt <span class="ot">&lt;-</span> <span class="fu">diff</span>(time)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  dx <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">diff</span>(x))</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  A <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> eps<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  B <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(pi <span class="sc">*</span> A)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">p</span>(x, pm, p0, p1)</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  ks <span class="ot">&lt;-</span> <span class="fu">k</span>(x, k0, k1)</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  J <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(x, <span class="sc">~</span> <span class="fu">exp</span>(<span class="sc">-</span>(.x <span class="sc">-</span> x)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> A) <span class="sc">/</span> B)</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  distribution <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="dv">0</span>, sigma0)</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  mr_bact_pop <span class="ot">&lt;-</span> size0 <span class="sc">*</span> distribution <span class="sc">/</span> <span class="fu">sum</span>(distribution)</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  bact_pop <span class="ot">&lt;-</span> <span class="fu">list</span>(mr_bact_pop)</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  mr_pop_size <span class="ot">&lt;-</span> pop_size <span class="ot">&lt;-</span> <span class="fu">sum</span>(mr_bact_pop)</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (dt_val <span class="cf">in</span> dt) {</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    L <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(J, <span class="sc">~</span> <span class="fu">sum</span>(.x <span class="sc">*</span> ps <span class="sc">*</span> mr_bact_pop)) <span class="sc">*</span> dx <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> mr_pop_size)<span class="sc">^</span>alpha</span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    mr_bact_pop <span class="ot">&lt;-</span> (mr_bact_pop <span class="sc">+</span> dt_val <span class="sc">*</span> L) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> dt_val <span class="sc">*</span> (mu <span class="sc">+</span> ks))</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>    bact_pop <span class="ot">&lt;-</span> <span class="fu">c</span>(bact_pop, <span class="fu">list</span>(mr_bact_pop))</span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    mr_pop_size <span class="ot">&lt;-</span> <span class="fu">sum</span>(mr_bact_pop)</span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="ot">&lt;-</span> <span class="fu">c</span>(pop_size, mr_pop_size)</span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">bact_pop =</span> <span class="fu">as.matrix</span>(<span class="fu">as.data.frame</span>(bact_pop)), <span class="at">pop_size =</span> pop_size,</span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> x, <span class="at">time =</span> time, <span class="at">param =</span> <span class="fu">c</span>(<span class="at">size0  =</span> size0,</span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">sigma0 =</span> sigma0,</span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">pm     =</span> pm,</span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">p0     =</span> p0,</span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">p1     =</span> p1,</span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">k0     =</span> k0,</span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">k1     =</span> k1,</span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">alpha  =</span> alpha,</span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">mu     =</span> mu,</span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">eps    =</span> eps))</span>
-<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>simulator <span class="ot">&lt;-</span> <span class="cf">function</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  dt <span class="ot">&lt;-</span> <span class="fu">diff</span>(time)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  dx <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">diff</span>(x))</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  A <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> eps<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  B <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(pi <span class="sc">*</span> A)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  J <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(x, <span class="sc">~</span> <span class="fu">exp</span>(<span class="sc">-</span>(.x <span class="sc">-</span> x)<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> A) <span class="sc">/</span> B)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">p</span>(x, pm, p0, p1)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  ks <span class="ot">&lt;-</span> <span class="fu">k</span>(x, k0, k1)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  distribution <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="dv">0</span>, sigma0)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  mr_bact_pop <span class="ot">&lt;-</span> size0 <span class="sc">*</span> distribution <span class="sc">/</span> <span class="fu">sum</span>(distribution)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  bact_pop <span class="ot">&lt;-</span> <span class="fu">list</span>(mr_bact_pop)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  mr_pop_size <span class="ot">&lt;-</span> pop_size <span class="ot">&lt;-</span> <span class="fu">sum</span>(mr_bact_pop)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (dt_val <span class="cf">in</span> dt) {</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    L <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_dbl</span>(J, <span class="sc">~</span> <span class="fu">sum</span>(.x <span class="sc">*</span> ps <span class="sc">*</span> mr_bact_pop)) <span class="sc">*</span> dx <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> mr_pop_size)<span class="sc">^</span>alpha</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    mr_bact_pop <span class="ot">&lt;-</span> (mr_bact_pop <span class="sc">+</span> dt_val <span class="sc">*</span> L) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> dt_val <span class="sc">*</span> (mu <span class="sc">+</span> ks))</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    bact_pop <span class="ot">&lt;-</span> <span class="fu">c</span>(bact_pop, <span class="fu">list</span>(mr_bact_pop))</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    mr_pop_size <span class="ot">&lt;-</span> <span class="fu">sum</span>(mr_bact_pop)</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="ot">&lt;-</span> <span class="fu">c</span>(pop_size, mr_pop_size)</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">bact_pop =</span> <span class="fu">as.matrix</span>(<span class="fu">as.data.frame</span>(bact_pop)), <span class="at">pop_size =</span> pop_size,</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> x, <span class="at">time =</span> time, <span class="at">param =</span> <span class="fu">c</span>(<span class="at">size0  =</span> size0,</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">sigma0 =</span> sigma0,</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">pm     =</span> pm,</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">p0     =</span> p0,</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">p1     =</span> p1,</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">k0     =</span> k0,</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">k1     =</span> k1,</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">alpha  =</span> alpha,</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">mu     =</span> mu,</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">eps    =</span> eps))</span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The mean level of resistance:</p>
+<p><span class="math display">\[
+\eta(t) = \int_\mathbb{R} x\frac{b(t,x)}{B(t)}dx
+\]</span></p>
+<p>A function that computes the mean resistance as a function of time:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mean_resistance <span class="ot">&lt;-</span> <span class="cf">function</span>(out) {</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(out, bact_pop <span class="sc">|&gt;</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>         purrr<span class="sc">::</span><span class="fu">map</span>(magrittr<span class="sc">::</span>multiply_by, x) <span class="sc">|&gt;</span> </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>         purrr<span class="sc">::</span><span class="fu">map_dbl</span>(sum) <span class="sc">|&gt;</span> </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>         magrittr<span class="sc">::</span><span class="fu">divide_by</span>(pop_size))</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The variance of the resistance level:</p>
+<p><span class="math display">\[
+\sigma^2(t) = \int_\mathbb{R} (x - \eta(t))^2\frac{b(t,x)}{B(t)}dx
+\]</span></p>
+<p>A function that computes the variance of resistance level as a function of time:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>resistance_variance <span class="ot">&lt;-</span> <span class="cf">function</span>(out) {</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  mean_res <span class="ot">&lt;-</span> <span class="fu">mean_resistance</span>(out)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  x2 <span class="ot">&lt;-</span> <span class="fu">map</span>(mean_res, <span class="sc">~</span> (.x <span class="sc">-</span> out<span class="sc">$</span>x)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(out, bact_pop <span class="sc">|&gt;</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>         purrr<span class="sc">::</span><span class="fu">map2</span>(x2, magrittr<span class="sc">::</span>multiply_by) <span class="sc">|&gt;</span> </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>         purrr<span class="sc">::</span><span class="fu">map_dbl</span>(sum) <span class="sc">|&gt;</span> </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>         magrittr<span class="sc">::</span><span class="fu">divide_by</span>(pop_size))</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A function that log-transforms the time of a simulator’s output:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>log_transform <span class="ot">&lt;-</span> <span class="cf">function</span>(out) {</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  out<span class="sc">$</span>bact_pop <span class="ot">&lt;-</span> out<span class="sc">$</span>bact_pop[, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  out<span class="sc">$</span>time <span class="ot">&lt;-</span> <span class="fu">log10</span>(out<span class="sc">$</span>time[<span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  out<span class="sc">$</span>pop_size <span class="ot">&lt;-</span> out<span class="sc">$</span>pop_size[<span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  out</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A function that resamples time and/or x:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>resample <span class="ot">&lt;-</span> <span class="cf">function</span>(out, n_time, <span class="at">n_x =</span> <span class="cn">NULL</span>) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(n_x)) n_x <span class="ot">&lt;-</span> <span class="fu">length</span>(out<span class="sc">$</span>x)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  bact_pop <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">t</span>(out<span class="sc">$</span>bact_pop))</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  time <span class="ot">&lt;-</span> out<span class="sc">$</span>time</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> out<span class="sc">$</span>x</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  time2 <span class="ot">&lt;-</span> out<span class="sc">$</span>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(time), <span class="fu">max</span>(time), <span class="at">le =</span> n_time)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  x2 <span class="ot">&lt;-</span> out<span class="sc">$</span>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(x), <span class="fu">max</span>(x), <span class="at">le =</span> n_x)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  out<span class="sc">$</span>bact_pop <span class="ot">&lt;-</span> bact_pop <span class="sc">|&gt;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map</span>(<span class="sc">~</span> <span class="fu">approx</span>(time, .x, time2)<span class="sc">$</span>y) <span class="sc">|&gt;</span> </span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_transposed_dataframe</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map</span>(<span class="sc">~</span> <span class="fu">approx</span>(x, .x, x2)<span class="sc">$</span>y) <span class="sc">|&gt;</span> </span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">t</span>()</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  out</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Solving one example (takes 7”):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> <span class="fl">2.5</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>sigma0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>k0 <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>k1 <span class="ot">&lt;-</span> .<span class="dv">1</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>pm <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fl">9.5</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fl">4.75</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> .<span class="dv">95</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>eps <span class="ot">&lt;-</span> .<span class="dv">01</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">simulator</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> <span class="fl">2.5</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>sigma0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>k0 <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>k1 <span class="ot">&lt;-</span> .<span class="dv">1</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>pm <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fl">9.5</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fl">4.75</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> .<span class="dv">95</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>eps <span class="ot">&lt;-</span> .<span class="dv">01</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">simulator</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>A first visualization (takes 3”):</p>
+<p>Log transforming time:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, <span class="fu">image</span>(x, <span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), bact_pop[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">bty =</span> <span class="st">"o"</span>,</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlab =</span> <span class="st">"level of resistance"</span>, <span class="at">ylab =</span> <span class="st">"log10(time)"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>out2 <span class="ot">&lt;-</span> <span class="fu">log_transform</span>(out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Resampling for the 2D plot:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>out2D <span class="ot">&lt;-</span> <span class="fu">resample</span>(out2, <span class="dv">512</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Resampling for the 3D plot:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>out3D <span class="ot">&lt;-</span> <span class="fu">resample</span>(out2, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A 2D visualization (takes 0.5”):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out2D, <span class="fu">image</span>(time, x, bact_pop, <span class="at">bty =</span> <span class="st">"o"</span>,</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">#                  col = hcl.colors(12, "YlOrRd", rev = TRUE),</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">col =</span> plot3D<span class="sc">::</span><span class="fu">jet.col</span>(),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">xlab =</span> <span class="st">"log10(time)"</span>, <span class="at">ylab =</span> <span class="st">"level of resistance"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>A second visualization (takes 5”):</p>
+<p>A 3D visualization (takes 1”):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, <span class="fu">persp</span>(x, <span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), bact_pop[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">col =</span> <span class="dv">4</span>, <span class="at">border =</span> <span class="cn">NA</span>, <span class="at">shade =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">theta =</span> <span class="sc">-</span><span class="dv">45</span>, <span class="at">phi =</span> <span class="dv">15</span>, <span class="at">r =</span> <span class="dv">10</span> <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="dv">3</span>), <span class="at">expand =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">3</span>, <span class="at">box =</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out3D, plot3D<span class="sc">::</span><span class="fu">persp3D</span>(time, x, bact_pop, <span class="at">theta =</span> <span class="sc">-</span><span class="dv">45</span>, <span class="at">phi =</span> <span class="dv">15</span>, <span class="at">r =</span> <span class="dv">10</span> <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="dv">3</span>),</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">expand =</span> .<span class="dv">6</span>, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">shade =</span> <span class="dv">1</span>, <span class="at">ltheta =</span> <span class="sc">-</span><span class="dv">45</span>,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">image =</span> <span class="cn">TRUE</span>, <span class="at">zlim =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, .<span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>A third visualization (takes 26”):</p>
+<p>Plotting the bacterial population size as a function of time:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, plot3D<span class="sc">::</span><span class="fu">persp3D</span>(x, <span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), bact_pop[, <span class="sc">-</span><span class="dv">1</span>], <span class="at">theta =</span> <span class="sc">-</span><span class="dv">45</span>, <span class="at">phi =</span> <span class="dv">15</span>,</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">r =</span> <span class="dv">10</span> <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="dv">3</span>), <span class="at">expand =</span> .<span class="dv">6</span>, <span class="at">box =</span> <span class="cn">FALSE</span>, <span class="at">shade =</span> <span class="dv">1</span>,</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">image =</span> <span class="cn">TRUE</span>, <span class="at">zlim =</span> <span class="fu">c</span>(<span class="sc">-</span>.<span class="dv">1</span>, .<span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out2, <span class="fu">plotl</span>(time, <span class="fu">log10</span>(pop_size), <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"log10(population size)"</span>))</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">add_ticks</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>A fourth visualization:</p>
+<p>Plotting the mean resistance as a function of time:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rgl::open3d()</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># with(out, rgl::persp3d(x, log10(time[-1]), bact_pop[, -1]))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out, <span class="fu">plotl</span>(<span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">log10</span>(pop_size[<span class="sc">-</span><span class="dv">1</span>]), <span class="at">xaxs =</span> <span class="st">"i"</span>,</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlab =</span> <span class="st">"log10(time)"</span>, <span class="at">ylab =</span> <span class="st">"log10(population size)"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(out2<span class="sc">$</span>time, <span class="fu">mean_resistance</span>(out2), <span class="at">axes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"mean level of resistance"</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="fu">add_ticks</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>mean_resistance <span class="ot">&lt;-</span> <span class="cf">function</span>(out) {</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(out, bact_pop <span class="sc">|&gt;</span> </span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>         purrr<span class="sc">::</span><span class="fu">map</span>(magrittr<span class="sc">::</span>multiply_by, x) <span class="sc">|&gt;</span> </span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>         purrr<span class="sc">::</span><span class="fu">map_dbl</span>(sum) <span class="sc">|&gt;</span> </span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>         magrittr<span class="sc">::</span><span class="fu">divide_by</span>(pop_size))</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(<span class="fu">log10</span>(out<span class="sc">$</span>time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">mean_resistance</span>(out)[<span class="sc">-</span><span class="dv">1</span>],</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"log10(time)"</span>, <span class="at">ylab =</span> <span class="st">"mean level of resistance"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -437,80 +561,169 @@ Attaching package: 'dplyr'</code></pre>
 </section>
 <section id="treatment-outpout" class="level2">
 <h2 class="anchored" data-anchor-id="treatment-outpout">Treatment outpout</h2>
+<p>The fitness cost-benefice of resistance:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>cb <span class="ot">&lt;-</span> <span class="cf">function</span>(p, k, mu) {</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  k <span class="sc">*</span> pm <span class="sc">/</span> ((mu <span class="sc">+</span> k) <span class="sc">*</span> (pm <span class="sc">-</span> p))</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>cb <span class="ot">&lt;-</span> <span class="cf">function</span>(p, k, mu) {</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  k <span class="sc">*</span> pm <span class="sc">/</span> ((mu <span class="sc">+</span> k) <span class="sc">*</span> (pm <span class="sc">-</span> p))</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>The efficacy of the drug:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>k_mu <span class="ot">&lt;-</span> <span class="cf">function</span>(cb, pm, mu) {</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  gamma <span class="ot">&lt;-</span> pm <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> cb) <span class="sc">/</span> <span class="dv">2</span> <span class="sc">-</span> mu</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  (gamma <span class="sc">+</span> <span class="fu">sqrt</span>(gamma<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> mu <span class="sc">*</span> (pm <span class="sc">-</span> mu))) <span class="sc">/</span> mu</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>k_mu <span class="ot">&lt;-</span> <span class="cf">function</span>(cb, pm, mu) {</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  gamma <span class="ot">&lt;-</span> pm <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> cb) <span class="sc">/</span> <span class="dv">2</span> <span class="sc">-</span> mu</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  (gamma <span class="sc">+</span> <span class="fu">sqrt</span>(gamma<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> mu <span class="sc">*</span> (pm <span class="sc">-</span> mu))) <span class="sc">/</span> mu</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Figure 4:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># p02 &lt;- p0</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>p02 <span class="ot">&lt;-</span> <span class="dv">7</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>cb_max <span class="ot">&lt;-</span> <span class="dv">4</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>veps <span class="ot">&lt;-</span> .<span class="dv">001</span></span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>mu_val <span class="ot">&lt;-</span> <span class="fu">seq</span>(veps, <span class="dv">1000</span>, veps)</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>cb_val <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">25</span>)</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>cb0 <span class="ot">&lt;-</span> <span class="fu">cb</span>(p02, k0, mu_val)</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>cb1 <span class="ot">&lt;-</span> <span class="fu">cb</span>(p1, k1, mu_val)</span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>y0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, k0 <span class="sc">/</span> mu_val)</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, k1 <span class="sc">/</span> mu_val)</span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>cb0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, cb0)</span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>cb1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, cb1)</span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>cbs <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, cb_max)</span>
-<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>line_green <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> cbs, <span class="at">y =</span> <span class="fu">approx</span>(cb0, y0, cbs)<span class="sc">$</span>y) <span class="sc">|&gt;</span> </span>
-<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.exclude</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(x)</span>
-<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>line_red <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> cbs, <span class="at">y =</span> <span class="fu">approx</span>(cb1, y1, cbs)<span class="sc">$</span>y) <span class="sc">|&gt;</span> </span>
-<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.exclude</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(x)</span>
-<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>line_black <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> cbs, <span class="at">y =</span> <span class="fu">approx</span>(cb_val, <span class="fu">k_mu</span>(cb_val, pm, mu), cbs)<span class="sc">$</span>y) <span class="sc">|&gt;</span> </span>
-<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.exclude</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(x)</span>
-<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>Xintersect <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
-<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">|&gt;</span></span>
-<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(line_black, <span class="at">by =</span> <span class="st">"x"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(y.x <span class="sc">&gt;</span> y.y) <span class="sc">|&gt;</span> </span>
-<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(x) <span class="sc">|&gt;</span></span>
-<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">1</span>)</span>
-<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb36-36"><a href="#cb36-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-37"><a href="#cb36-37" aria-hidden="true" tabindex="-1"></a>Xintersect0 <span class="ot">&lt;-</span> <span class="fu">Xintersect</span>(line_green)</span>
-<span id="cb36-38"><a href="#cb36-38" aria-hidden="true" tabindex="-1"></a>Xintersect1 <span class="ot">&lt;-</span> <span class="fu">Xintersect</span>(line_red)</span>
-<span id="cb36-39"><a href="#cb36-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-40"><a href="#cb36-40" aria-hidden="true" tabindex="-1"></a><span class="do">#######################################################################################</span></span>
-<span id="cb36-41"><a href="#cb36-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-42"><a href="#cb36-42" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">3</span>), <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>, <span class="at">bty =</span> <span class="st">"o"</span>,</span>
-<span id="cb36-43"><a href="#cb36-43" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"cost / benefit of resistance"</span>, <span class="at">ylab =</span> <span class="st">"drug efficacy"</span>)</span>
-<span id="cb36-44"><a href="#cb36-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-45"><a href="#cb36-45" aria-hidden="true" tabindex="-1"></a><span class="fu">full_join</span>(line_black, line_green, <span class="at">by =</span> <span class="st">"x"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-46"><a href="#cb36-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">y =</span> <span class="fu">map2_dbl</span>(y.x, y.y, min, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb36-47"><a href="#cb36-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">polygon3</span>(x, y, <span class="at">col =</span> colS, <span class="at">alpha =</span> <span class="dv">1</span>))</span>
-<span id="cb36-48"><a href="#cb36-48" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon</span>(<span class="fu">c</span>(line_green<span class="sc">$</span>x, <span class="fu">rev</span>(line_red<span class="sc">$</span>x)), <span class="fu">c</span>(line_green<span class="sc">$</span>y, <span class="fu">rev</span>(line_red<span class="sc">$</span>y)), <span class="at">col =</span> colI,</span>
-<span id="cb36-49"><a href="#cb36-49" aria-hidden="true" tabindex="-1"></a>        <span class="at">border =</span> <span class="cn">NA</span>)</span>
-<span id="cb36-50"><a href="#cb36-50" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(line_red, <span class="fu">polygon4</span>(x, y, <span class="at">col =</span> colR))</span>
-<span id="cb36-51"><a href="#cb36-51" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(line_black, <span class="fu">polygon5</span>(x, y, <span class="at">col =</span> <span class="st">"lightgrey"</span>))</span>
-<span id="cb36-52"><a href="#cb36-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-53"><a href="#cb36-53" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">filter</span>(line_red, x <span class="sc">&lt;</span> Xintersect1), <span class="fu">lines2</span>(x, y))</span>
-<span id="cb36-54"><a href="#cb36-54" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">filter</span>(line_red, x <span class="sc">&gt;</span> Xintersect1), <span class="fu">lines2</span>(x, y, <span class="at">lty =</span> <span class="dv">3</span>))</span>
-<span id="cb36-55"><a href="#cb36-55" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">filter</span>(line_green, x <span class="sc">&lt;</span> Xintersect0), <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">3</span>))</span>
-<span id="cb36-56"><a href="#cb36-56" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">filter</span>(line_green, x <span class="sc">&gt;</span> Xintersect0), <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">3</span>, <span class="at">lty =</span> <span class="dv">3</span>))</span>
-<span id="cb36-57"><a href="#cb36-57" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">-</span> p1 <span class="sc">/</span> pm, <span class="dv">1</span> <span class="sc">-</span> p02 <span class="sc">/</span> pm), <span class="at">col =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>)</span>
-<span id="cb36-58"><a href="#cb36-58" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(line_black, <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># p02 &lt;- p0</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>p02 <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>cb_max <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>veps <span class="ot">&lt;-</span> .<span class="dv">001</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>mu_val <span class="ot">&lt;-</span> <span class="fu">seq</span>(veps, <span class="dv">1000</span>, veps)</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>cb_val <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">25</span>)</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>cb0 <span class="ot">&lt;-</span> <span class="fu">cb</span>(p02, k0, mu_val)</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>cb1 <span class="ot">&lt;-</span> <span class="fu">cb</span>(p1, k1, mu_val)</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>y0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, k0 <span class="sc">/</span> mu_val)</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, k1 <span class="sc">/</span> mu_val)</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>cb0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, cb0)</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>cb1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, cb1)</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>cbs <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, cb_max)</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>line_green <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> cbs, <span class="at">y =</span> <span class="fu">approx</span>(cb0, y0, cbs)<span class="sc">$</span>y) <span class="sc">|&gt;</span> </span>
+<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.exclude</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(x)</span>
+<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>line_red <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> cbs, <span class="at">y =</span> <span class="fu">approx</span>(cb1, y1, cbs)<span class="sc">$</span>y) <span class="sc">|&gt;</span> </span>
+<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.exclude</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(x)</span>
+<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a>line_black <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> cbs, <span class="at">y =</span> <span class="fu">approx</span>(cb_val, <span class="fu">k_mu</span>(cb_val, pm, mu), cbs)<span class="sc">$</span>y) <span class="sc">|&gt;</span> </span>
+<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.exclude</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(x)</span>
+<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>Xintersect <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
+<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">|&gt;</span></span>
+<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(line_black, <span class="at">by =</span> <span class="st">"x"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(y.x <span class="sc">&gt;</span> y.y) <span class="sc">|&gt;</span> </span>
+<span id="cb39-33"><a href="#cb39-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(x) <span class="sc">|&gt;</span></span>
+<span id="cb39-34"><a href="#cb39-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">1</span>)</span>
+<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-37"><a href="#cb39-37" aria-hidden="true" tabindex="-1"></a>Xintersect0 <span class="ot">&lt;-</span> <span class="fu">Xintersect</span>(line_green)</span>
+<span id="cb39-38"><a href="#cb39-38" aria-hidden="true" tabindex="-1"></a>Xintersect1 <span class="ot">&lt;-</span> <span class="fu">Xintersect</span>(line_red)</span>
+<span id="cb39-39"><a href="#cb39-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-40"><a href="#cb39-40" aria-hidden="true" tabindex="-1"></a><span class="do">#######################################################################################</span></span>
+<span id="cb39-41"><a href="#cb39-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-42"><a href="#cb39-42" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">3</span>), <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>, <span class="at">bty =</span> <span class="st">"o"</span>,</span>
+<span id="cb39-43"><a href="#cb39-43" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"cost / benefit of resistance"</span>, <span class="at">ylab =</span> <span class="st">"drug efficacy"</span>)</span>
+<span id="cb39-44"><a href="#cb39-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-45"><a href="#cb39-45" aria-hidden="true" tabindex="-1"></a><span class="fu">full_join</span>(line_black, line_green, <span class="at">by =</span> <span class="st">"x"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb39-46"><a href="#cb39-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">y =</span> <span class="fu">map2_dbl</span>(y.x, y.y, min, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb39-47"><a href="#cb39-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">polygon3</span>(x, y, <span class="at">col =</span> colS, <span class="at">alpha =</span> <span class="dv">1</span>))</span>
+<span id="cb39-48"><a href="#cb39-48" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon</span>(<span class="fu">c</span>(line_green<span class="sc">$</span>x, <span class="fu">rev</span>(line_red<span class="sc">$</span>x)), <span class="fu">c</span>(line_green<span class="sc">$</span>y, <span class="fu">rev</span>(line_red<span class="sc">$</span>y)), <span class="at">col =</span> colI,</span>
+<span id="cb39-49"><a href="#cb39-49" aria-hidden="true" tabindex="-1"></a>        <span class="at">border =</span> <span class="cn">NA</span>)</span>
+<span id="cb39-50"><a href="#cb39-50" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(line_red, <span class="fu">polygon4</span>(x, y, <span class="at">col =</span> colR))</span>
+<span id="cb39-51"><a href="#cb39-51" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(line_black, <span class="fu">polygon5</span>(x, y, <span class="at">col =</span> <span class="st">"lightgrey"</span>))</span>
+<span id="cb39-52"><a href="#cb39-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-53"><a href="#cb39-53" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">filter</span>(line_red, x <span class="sc">&lt;</span> Xintersect1), <span class="fu">lines2</span>(x, y))</span>
+<span id="cb39-54"><a href="#cb39-54" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">filter</span>(line_red, x <span class="sc">&gt;</span> Xintersect1), <span class="fu">lines2</span>(x, y, <span class="at">lty =</span> <span class="dv">3</span>))</span>
+<span id="cb39-55"><a href="#cb39-55" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">filter</span>(line_green, x <span class="sc">&lt;</span> Xintersect0), <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">3</span>))</span>
+<span id="cb39-56"><a href="#cb39-56" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">filter</span>(line_green, x <span class="sc">&gt;</span> Xintersect0), <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">3</span>, <span class="at">lty =</span> <span class="dv">3</span>))</span>
+<span id="cb39-57"><a href="#cb39-57" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">-</span> p1 <span class="sc">/</span> pm, <span class="dv">1</span> <span class="sc">-</span> p02 <span class="sc">/</span> pm), <span class="at">col =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb39-58"><a href="#cb39-58" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(line_black, <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="exploring-the-effect-of-speed-of-evolution" class="level2">
+<h2 class="anchored" data-anchor-id="exploring-the-effect-of-speed-of-evolution">Exploring the effect of speed of evolution</h2>
+<p>A version of the simulator without any mutation:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>simulator_no_mut <span class="ot">&lt;-</span> <span class="cf">function</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, x, time) {</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  dt <span class="ot">&lt;-</span> <span class="fu">diff</span>(time)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  dx <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">diff</span>(x))</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  ps <span class="ot">&lt;-</span> <span class="fu">p</span>(x, pm, p0, p1)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  ks <span class="ot">&lt;-</span> <span class="fu">k</span>(x, k0, k1)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  distribution <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="dv">0</span>, sigma0)</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  mr_bact_pop <span class="ot">&lt;-</span> size0 <span class="sc">*</span> distribution <span class="sc">/</span> <span class="fu">sum</span>(distribution)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  bact_pop <span class="ot">&lt;-</span> <span class="fu">list</span>(mr_bact_pop)</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  mr_pop_size <span class="ot">&lt;-</span> pop_size <span class="ot">&lt;-</span> <span class="fu">sum</span>(mr_bact_pop)</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (dt_val <span class="cf">in</span> dt) {</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>    L <span class="ot">&lt;-</span> ps <span class="sc">*</span> mr_bact_pop <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> mr_pop_size)<span class="sc">^</span>alpha</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>    mr_bact_pop <span class="ot">&lt;-</span> (mr_bact_pop <span class="sc">+</span> dt_val <span class="sc">*</span> L) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> dt_val <span class="sc">*</span> (mu <span class="sc">+</span> ks))</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>    bact_pop <span class="ot">&lt;-</span> <span class="fu">c</span>(bact_pop, <span class="fu">list</span>(mr_bact_pop))</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>    mr_pop_size <span class="ot">&lt;-</span> <span class="fu">sum</span>(mr_bact_pop)</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="ot">&lt;-</span> <span class="fu">c</span>(pop_size, mr_pop_size)</span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">bact_pop =</span> <span class="fu">as.matrix</span>(<span class="fu">as.data.frame</span>(bact_pop)), <span class="at">pop_size =</span> pop_size,</span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> x, <span class="at">time =</span> time, <span class="at">param =</span> <span class="fu">c</span>(<span class="at">size0  =</span> size0,</span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">sigma0 =</span> sigma0,</span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">pm     =</span> pm,</span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">p0     =</span> p0,</span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">p1     =</span> p1,</span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">k0     =</span> k0,</span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">k1     =</span> k1,</span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">alpha  =</span> alpha,</span>
+<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">mu     =</span> mu))</span>
+<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Comparing with and without mutation:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> <span class="fl">2.5</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>sigma0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>k0 <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>k1 <span class="ot">&lt;-</span> .<span class="dv">1</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>pm <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fl">9.5</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fl">4.75</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> .<span class="dv">95</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>eps <span class="ot">&lt;-</span> .<span class="dv">01</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>mutation <span class="ot">&lt;-</span> <span class="fu">simulator</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>no_mutation <span class="ot">&lt;-</span> <span class="fu">simulator_no_mut</span>(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, x, time)</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(mutation, <span class="fu">plotl</span>(<span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">log10</span>(pop_size[<span class="sc">-</span><span class="dv">1</span>]), <span class="at">xaxs =</span> <span class="st">"i"</span>,</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlab =</span> <span class="st">"log10(time)"</span>, <span class="at">ylab =</span> <span class="st">"log10(population size)"</span>))</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(no_mutation, <span class="fu">lines2</span>(<span class="fu">log10</span>(time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">log10</span>(pop_size[<span class="sc">-</span><span class="dv">1</span>])))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="qAMR_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(<span class="fu">log10</span>(mutation<span class="sc">$</span>time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">mean_resistance</span>(mutation)[<span class="sc">-</span><span class="dv">1</span>],</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"log10(time)"</span>, <span class="at">ylab =</span> <span class="st">"mean level of resistance"</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines2</span>(<span class="fu">log10</span>(no_mutation<span class="sc">$</span>time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">mean_resistance</span>(no_mutation)[<span class="sc">-</span><span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="qAMR_files/figure-html/unnamed-chunk-41-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(<span class="fu">log10</span>(mutation<span class="sc">$</span>time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">resistance_variance</span>(mutation)[<span class="sc">-</span><span class="dv">1</span>], <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, .<span class="dv">004</span>),</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"log10(time)"</span>, <span class="at">ylab =</span> <span class="st">"variance of resistance"</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines2</span>(<span class="fu">log10</span>(no_mutation<span class="sc">$</span>time[<span class="sc">-</span><span class="dv">1</span>]), <span class="fu">resistance_variance</span>(no_mutation)[<span class="sc">-</span><span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="qAMR_files/figure-html/unnamed-chunk-41-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

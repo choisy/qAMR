@@ -6,14 +6,11 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r include = FALSE}
-knitr::opts_chunk$set(cache = TRUE)
-```
-
-
 ## Packages
 
-```{r}
+Installing packages:
+
+```{r message = FALSE}
 needed_packages <- c("dplyr",
                      "magrittr",
                      "plot3D",
@@ -24,12 +21,17 @@ to_install <- needed_packages[! needed_packages %in% installed.packages()[,"Pack
 if (length(to_install)) install.packages(to_install)
 ```
 
-```{r}
+Loading packages:
+
+```{r message = FALSE}
 library(dplyr)
 library(purrr)
 ```
 
+
 ## Functions
+
+A few utility functions.
 
 ```{r}
 polygon2 <- function(...) polygon(..., border = NA)
@@ -42,15 +44,11 @@ polygon3 <- function(x, y, col = 4, alpha = .2, ...) {
 ```
 
 ```{r}
-polygon4 <- function(x, y, ...) {
-  polygon2(c(x[1], x), c(tail(y, 1), y), ...)
-}
+polygon4 <- function(x, y, ...) polygon2(c(x[1], x), c(tail(y, 1), y), ...)
 ```
 
 ```{r}
-polygon5 <- function(x, y, ...) {
-  polygon2(c(tail(x, 1), x), c(y[1], y), ...)
-}
+polygon5 <- function(x, y, ...) polygon2(c(tail(x, 1), x), c(y[1], y), ...)
 ```
 
 ```{r}
@@ -73,13 +71,41 @@ rect2 <- function(...) rect(..., border = NA)
 seq2 <- function(...) seq(..., le = 512)
 ```
 
+```{r}
+as_transposed_dataframe <- function(x) as.data.frame(t(as.data.frame(x)))
+```
+
+```{r}
+log10Tck <- function(side, type) {
+   lim <- switch(side, 
+                 x = par("usr")[1:2],
+                 y = par("usr")[3:4],
+                 stop("side argument must be 'x' or 'y'"))
+   at <- floor(lim[1]):ceiling(lim[2])
+   switch(type,
+          minor = outer(1:9, 10^(min(at):max(at))),
+          major = 10^at,
+          stop("type argument must be 'major' or 'minor'"))
+}
+```
+
+```{r}
+add_ticks <- function() {
+  at1 <- log10Tck("x", "major")
+  at2 <- log10Tck("x", "minor")
+  axis(1, log10(at1), at1, tcl = -.5)
+  axis(1, log10(at2), NA, tcl = -.25)
+  axis(2)
+}
+```
+
 
 ## A bimodal distribution
 
 ```{r}
-x <- seq(0, 10, le = 512)
+x <- seq2(0, 10)
 y1 <- dnorm(x, 2.5, .8)
-y2 <- dnorm(x,7, .5)
+y2 <- dnorm(x, 7, .5)
 plot(x, y1, type = "n")
 polygon3(x, y1)
 polygon3(x, .25 * y2)
@@ -88,18 +114,36 @@ polygon3(x, .25 * y2)
 
 ## A scale-free metric of resistance
 
+$$
+x = \frac{\log\left(\frac{\rm MIC}{\rm C_0}\right)}{\log\left(\frac{\rm C_1}{\rm C_0}\right)}
+$$
+
 ```{r}
 C0 <- 1
 C1 <- 3
-mic <- seq(0, 10, le = 512)
+mic <- seq2(0, 10)
 x <- log(mic / C0) / log(C1 / C0)
-plot(mic, x, type = "l", lwd = 4, col = 4)
+plotl(mic, x)
 ```
 
 
 ## The MMNP model
 
-The antimicrobial activity as a function of bacterial resistance:
+$b(t,y)$ is the density of bacteria with resistance level $y$ at time $t$ and
+$B(t) = \int_\mathbb{R} b(t,y)dy$ is the total density of bacteria at time $t$. The
+evolutionary dynamics is described by the following equation:
+
+$$
+\frac{\partial b}{\partial t} = \frac{1}{(1 + B(t))^\alpha}\int_\mathbb{R} J(x-y)p(y)b(t,y)dy - (\mu(x) + k(x))b(t,x)
+$$
+
+The antimicrobial activity as a function of bacterial resistance can be expressed as:
+
+$$
+k(x) = k_0\left(\frac{k_1}{k_0}\right)^x
+$$
+
+The corresponding R function reads:
 
 ```{r}
 k <- function(x, k0, k1) {
@@ -117,6 +161,12 @@ plotl(x, k(x, 5, 3))
 
 The maximum bacterial growth rate as a function of bacterial resistance:
 
+$$
+p(x) = \frac{p_m}{1 + \frac{p_m - p_0}{p_0}\left(\frac{p_0}{p_1}\frac{p_m - p_1}{p_m - p_0}\right)^x}
+$$
+
+The corresponding R function:
+
 ```{r}
 p <- function(x, pm, p0, p1) {
   pm / (1 + ((pm - p0) / p0) * (p0 * (pm - p1) / (p1 * (pm - p0)))^x)
@@ -132,11 +182,41 @@ plotl(x, p(x, 10, 5, 3))
 
 The basic reproduction ratio:
 
+$$
+\mathcal{R}_0(x) = \frac{p(x)}{\mu(x) + k(x)}
+$$
+
+The corresponding R function:
+
 ```{r}
 R0 <- function(x, k0 = 3, k1 = .03, pm = 10, p0 = 9.5, p1 = 4.75, mu = .9) {
   p(x, pm, p0, p1) / (mu + k(x, k0, k1))
 }
 ```
+
+The invasion fitness of mutant $y$ in a resident population $x$:
+
+$$
+f_x(y) = \frac{\mathcal{R}_0(y) - \mathcal{R}_0(x)}{\mathcal{R}_0(x)}
+$$
+
+$$
+\frac{d\mathcal{R}_0}{dx} = \frac{k_0\log(1 + \theta)}{\left(\mu + \frac{k_0}{(1 + \theta)^x}\right)(1 + \theta)^x} - \frac{\left(\frac{p_m}{p_0} - 1\right)\log(\Delta)\Delta^x}{1 + \left(\frac{p_m}{p_0} - 1\right)\Delta^x}
+$$
+with 
+
+$$
+\theta = \frac{k_0 - k_1}{k_1} > 0
+$$
+
+where $\theta = 0$ means there is no fitness advantage provided by an increase in
+resistance level and
+
+$$
+\Delta = \frac{p_0}{p_1}\frac{p_m - p_1}{p_m - p_0} > 1
+$$
+
+where $\Delta = 1$ means there is no cost of resistance.
 
 A function that looks for the ESS:
 
@@ -156,7 +236,7 @@ R_evol_level <- function(k0, k1, p1, p0, pm, mu, interval = c(-10, 10), ...) {
 Plot of R0:
 
 ```{r}
-x <- seq(-.5, 1.5, le = 512)
+x <- seq2(-1, 2)
 
 k0 <- 10
 k1 <- .1
@@ -172,18 +252,20 @@ R0max <- max(R0_drug)
 
 xmin <- min(x)
 xmax <- max(x)
-ymax <- max(R0_nodrug)
+ymax <- 1.04 * max(R0_nodrug)
 
 colS <- rgb2(8, 146, 6)
 colI <- rgb2(255, 147, 1)
 colR <- rgb2(255, 63, 30)
 
-plot(x, R0_nodrug, ylim = c(0, ymax), type = "n", axes = FALSE,
+plot(x, R0_nodrug, ylim = c(0, ymax), type = "n", axes = FALSE, yaxs = "i",
      xlab = "level of resistance", ylab = "R0")
 
 rect2(xmin, -1, 0, ymax, col = colS)
 rect2(0, -1, 1, ymax, col = colI)
 rect2(1, -1, xmax, ymax, col = colR)
+
+abline(h = 1, lwd = 4, lty = 3)
 
 lines2(x, R0_drug)
 lines2(x, R0_nodrug, col = 4)
@@ -203,13 +285,12 @@ A function that numerically integrates the integro-differential equation of the 
 simulator <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {
   dt <- diff(time)
   dx <- mean(diff(x))
+  
   A <- 2 * eps^2
   B <- sqrt(pi * A)
-  
-  ps <- p(x, pm, p0, p1)
-  
-  ks <- k(x, k0, k1)
   J <- purrr::map(x, ~ exp(-(.x - x)^2 / A) / B)
+  ps <- p(x, pm, p0, p1)
+  ks <- k(x, k0, k1)
   
   distribution <- dnorm(x, 0, sigma0)
   mr_bact_pop <- size0 * distribution / sum(distribution)
@@ -238,9 +319,78 @@ simulator <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time
 }
 ```
 
-Solving one example (takes 7"):
+The mean level of resistance:
+
+$$
+\eta(t) = \int_\mathbb{R} x\frac{b(t,x)}{B(t)}dx
+$$
+
+A function that computes the mean resistance as a function of time:
 
 ```{r}
+mean_resistance <- function(out) {
+  with(out, bact_pop |> 
+         as.data.frame() |> 
+         purrr::map(magrittr::multiply_by, x) |> 
+         purrr::map_dbl(sum) |> 
+         magrittr::divide_by(pop_size))
+}
+```
+
+The variance of the resistance level:
+
+$$
+\sigma^2(t) = \int_\mathbb{R} (x - \eta(t))^2\frac{b(t,x)}{B(t)}dx
+$$
+
+A function that computes the variance of resistance level as a function of time:
+
+```{r}
+resistance_variance <- function(out) {
+  mean_res <- mean_resistance(out)
+  x2 <- map(mean_res, ~ (.x - out$x)^2)
+  with(out, bact_pop |>
+         as.data.frame() |>
+         purrr::map2(x2, magrittr::multiply_by) |> 
+         purrr::map_dbl(sum) |> 
+         magrittr::divide_by(pop_size))
+}
+```
+
+A function that log-transforms the time of a simulator's output:
+
+```{r}
+log_transform <- function(out) {
+  out$bact_pop <- out$bact_pop[, -1]
+  out$time <- log10(out$time[-1])
+  out$pop_size <- out$pop_size[-1]
+  out
+}
+```
+
+A function that resamples time and/or x:
+
+```{r}
+resample <- function(out, n_time, n_x = NULL) {
+  if (is.null(n_x)) n_x <- length(out$x)
+  bact_pop <- as.data.frame(t(out$bact_pop))
+  time <- out$time
+  x <- out$x
+  time2 <- out$time <- seq(min(time), max(time), le = n_time)
+  x2 <- out$x <- seq(min(x), max(x), le = n_x)
+  out$bact_pop <- bact_pop |>
+    map(~ approx(time, .x, time2)$y) |> 
+    as_transposed_dataframe() |> 
+    map(~ approx(x, .x, x2)$y) |> 
+    as.data.frame() |> 
+    t()
+  out
+}
+```
+
+Solving one example (takes 7"):
+
+```{r cache = TRUE}
 x <- seq2(-.5, 1.5)
 time <- seq(0, 300, .1)
 size0 <- 2.5
@@ -257,57 +407,62 @@ eps <- .01
 out <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
 ```
 
-A first visualization (takes 3"):
+Log transforming time:
 
 ```{r}
-with(out, image(x, log10(time[-1]), bact_pop[, -1], bty = "o",
-                xlab = "level of resistance", ylab = "log10(time)"))
+out2 <- log_transform(out)
 ```
 
-A second visualization (takes 5"):
+Resampling for the 2D plot:
 
 ```{r}
-with(out, persp(x, log10(time[-1]), bact_pop[, -1], col = 4, border = NA, shade = TRUE,
-                theta = -45, phi = 15, r = 10 * sqrt(3), expand = 1 / 3, box = FALSE))
+out2D <- resample(out2, 512)
 ```
 
-A third visualization (takes 26"):
+Resampling for the 3D plot:
 
 ```{r}
-with(out, plot3D::persp3D(x, log10(time[-1]), bact_pop[, -1], theta = -45, phi = 15,
-                          r = 10 * sqrt(3), expand = .6, box = FALSE, shade = 1,
-                          alpha = 1, image = TRUE, zlim = c(-.1, .1)))
+out3D <- resample(out2, 100)
 ```
 
-A fourth visualization:
+A 2D visualization (takes 0.5"):
 
 ```{r}
-# rgl::open3d()
-# with(out, rgl::persp3d(x, log10(time[-1]), bact_pop[, -1]))
+with(out2D, image(time, x, bact_pop, bty = "o",
+#                  col = hcl.colors(12, "YlOrRd", rev = TRUE),
+                  col = plot3D::jet.col(),
+                  xlab = "log10(time)", ylab = "level of resistance"))
 ```
 
-```{r}
-with(out, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i",
-                xlab = "log10(time)", ylab = "log10(population size)"))
-```
+A 3D visualization (takes 1"):
 
 ```{r}
-mean_resistance <- function(out) {
-  with(out, bact_pop |> 
-         as.data.frame() |> 
-         purrr::map(magrittr::multiply_by, x) |> 
-         purrr::map_dbl(sum) |> 
-         magrittr::divide_by(pop_size))
-}
+with(out3D, plot3D::persp3D(time, x, bact_pop, theta = -45, phi = 15, r = 10 * sqrt(3),
+                            expand = .6, box = FALSE, shade = 1, ltheta = -45,
+                            alpha = 1, image = TRUE, zlim = c(-.1, .1)))
 ```
 
+Plotting the bacterial population size as a function of time:
+
 ```{r}
-plotl(log10(out$time[-1]), mean_resistance(out)[-1],
-      xlab = "log10(time)", ylab = "mean level of resistance")
+with(out2, plotl(time, log10(pop_size), xaxs = "i", axes = FALSE,
+                 xlab = "time", ylab = "log10(population size)"))
+add_ticks()
+```
+
+Plotting the mean resistance as a function of time:
+
+```{r}
+plotl(out2$time, mean_resistance(out2), axes = FALSE,
+      xlab = "time", ylab = "mean level of resistance")
+
+add_ticks()
 ```
 
 
 ## Treatment outpout
+
+The fitness cost-benefice of resistance:
 
 ```{r}
 cb <- function(p, k, mu) {
@@ -315,12 +470,16 @@ cb <- function(p, k, mu) {
 }
 ```
 
+The efficacy of the drug:
+
 ```{r}
 k_mu <- function(cb, pm, mu) {
   gamma <- pm * (1 - cb) / 2 - mu
   (gamma + sqrt(gamma^2 + mu * (pm - mu))) / mu
 }
 ```
+
+Figure 4:
 
 ```{r}
 # p02 <- p0
@@ -385,6 +544,44 @@ with(line_black, lines2(x, y, col = 1))
 
 ## Exploring the effect of speed of evolution
 
+A version of the simulator without any mutation:
+
+```{r}
+simulator_no_mut <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, x, time) {
+  dt <- diff(time)
+  dx <- mean(diff(x))
+  
+  ps <- p(x, pm, p0, p1)
+  ks <- k(x, k0, k1)
+  
+  distribution <- dnorm(x, 0, sigma0)
+  mr_bact_pop <- size0 * distribution / sum(distribution)
+  bact_pop <- list(mr_bact_pop)
+  mr_pop_size <- pop_size <- sum(mr_bact_pop)
+  
+  for (dt_val in dt) {
+    L <- ps * mr_bact_pop / (1 + mr_pop_size)^alpha
+    mr_bact_pop <- (mr_bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
+    bact_pop <- c(bact_pop, list(mr_bact_pop))
+    mr_pop_size <- sum(mr_bact_pop)
+    pop_size <- c(pop_size, mr_pop_size)
+  }
+  
+  list(bact_pop = as.matrix(as.data.frame(bact_pop)), pop_size = pop_size,
+       x = x, time = time, param = c(size0  = size0,
+                                     sigma0 = sigma0,
+                                     pm     = pm,
+                                     p0     = p0,
+                                     p1     = p1,
+                                     k0     = k0,
+                                     k1     = k1,
+                                     alpha  = alpha,
+                                     mu     = mu))
+}
+```
+
+Comparing with and without mutation:
+
 ```{r}
 x <- seq2(-.5, 1.5)
 time <- seq(0, 300, .1)
@@ -399,51 +596,20 @@ mu <- .95
 alpha <- 1
 eps <- .01
 
-out <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
+mutation <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
+no_mutation <- simulator_no_mut(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, x, time)
 
-with(out, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i",
+with(mutation, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i",
                 xlab = "log10(time)", ylab = "log10(population size)"))
+with(no_mutation, lines2(log10(time[-1]), log10(pop_size[-1])))
 
-plotl(log10(out$time[-1]), mean_resistance(out)[-1],
+plotl(log10(mutation$time[-1]), mean_resistance(mutation)[-1],
       xlab = "log10(time)", ylab = "mean level of resistance")
+lines2(log10(no_mutation$time[-1]), mean_resistance(no_mutation)[-1])
+
+plotl(log10(mutation$time[-1]), resistance_variance(mutation)[-1], ylim = c(0, .004),
+      xlab = "log10(time)", ylab = "variance of resistance")
+lines2(log10(no_mutation$time[-1]), resistance_variance(no_mutation)[-1])
 ```
 
-```{r}
-out2 <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps = .001, x, time)
-
-with(out2, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i",
-                xlab = "log10(time)", ylab = "log10(population size)"))
-
-plotl(log10(out2$time[-1]), mean_resistance(out2)[-1],
-      xlab = "log10(time)", ylab = "mean level of resistance")
-```
-
-```{r}
-out3 <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps = .1, x, time)
-```
-
-
-```{r}
-with(out, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i", ylim = c(-.8, 1),
-                xlab = "log10(time)", ylab = "log10(population size)"))
-
-with(out2, lines2(log10(time[-1]), log10(pop_size[-1])))
-with(out3, lines2(log10(time[-1]), log10(pop_size[-1]), col = 3))
-```
-
-```{r}
-out4 <- simulator(size0, sigma0, pm, p0, p1, 2 * k0, 2 * k1, alpha, mu, eps = .1, x, time)
-```
-
-```{r}
-with(out4, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i", ylim = c(-.9, 1),
-                xlab = "log10(time)", ylab = "log10(population size)"))
-with(out3, lines2(log10(time[-1]), log10(pop_size[-1]), col = 3))
-```
-
-```{r}
-out5 <- simulator(size0, sigma0, pm, p0, p1, 50 * k0, 50 * k1, alpha, mu, eps = .0000001, x, time)
-with(out5, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i", ylim = c(-.9, 1),
-                xlab = "log10(time)", ylab = "log10(population size)"))
-```
 
