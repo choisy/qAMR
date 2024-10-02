@@ -325,61 +325,22 @@ plot_R0()
 A function that numerically integrates the integro-differential equation of the model:
 
 ```{r}
-simulator0 <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {
-  dt <- diff(time)
-  dx <- mean(diff(x))
-  ps <- p(x, pm, p0, p1)
-  ks <- k(x, k0, k1)
-  
-  if (eps > 0) {
-    A <- 2 * eps^2
-    B <- sqrt(pi * A)
-    J <- map(x, ~ exp(-(.x - x)^2 / A) / B)
-    update_bact_pop <- function(bact_pop, pop_size) {
-      L <- map_dbl(J, ~ sum(.x * ps * bact_pop)) * dx / (1 + pop_size)^alpha
-      (bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
-    }
-  } else {
-    update_bact_pop <- function(bact_pop, pop_size) {
-      L <- ps * bact_pop / (1 + pop_size)^alpha
-      (bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
-    }
-  }
-
-  distribution <- dnorm(x, 0, sigma0)
-  mr_bact_pop <- size0 * distribution / sum(distribution)
-  bact_pop <- list(mr_bact_pop)
-  mr_pop_size <- pop_size <- sum(mr_bact_pop)
-  for (dt_val in dt) {
-    mr_bact_pop <- update_bact_pop(mr_bact_pop, mr_pop_size)
-    bact_pop <- c(bact_pop, list(mr_bact_pop))
-    mr_pop_size <- sum(mr_bact_pop)
-    pop_size <- c(pop_size, mr_pop_size)
-  }
-  
-  list(bact_pop = as.matrix(as.data.frame(bact_pop)), pop_size = pop_size,
-       x = x, time = time, param = c(size0  = size0,
-                                     sigma0 = sigma0,
-                                     pm     = pm,
-                                     p0     = p0,
-                                     p1     = p1,
-                                     k0     = k0,
-                                     k1     = k1,
-                                     alpha  = alpha,
-                                     mu     = mu,
-                                     eps    = eps))
-}
-```
-
-
-
-```{r}
 simulator <- function(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {
   dt <- diff(time)
   dx <- mean(diff(x))
   ps <- p(x, pm, p0, p1)
   ks <- k(x, k0, k1)
   
+  if (sigma0 > 0) {
+    distribution <- dnorm(x, x0, sigma0)
+    mr_bact_pop <- size0 * distribution / sum(distribution)
+  } else {
+    x1 <- rev(seq(x0, min(x), - dx))
+    x2 <- seq(x0 + dx, max(x) + dx, dx)
+    x <- c(x1, x2)
+    mr_bact_pop <- c(rep(0, length(x1) - 1), size0, rep(0, length(x2)))
+  }
+  
   if (eps > 0) {
     A <- 2 * eps^2
     B <- sqrt(pi * A)
@@ -395,8 +356,6 @@ simulator <- function(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, 
     }
   }
 
-  distribution <- dnorm(x, x0, sigma0)
-  mr_bact_pop <- size0 * distribution / sum(distribution)
   bact_pop <- list(mr_bact_pop)
   mr_pop_size <- pop_size <- sum(mr_bact_pop)
   for (dt_val in dt) {
@@ -408,6 +367,7 @@ simulator <- function(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, 
   
   list(bact_pop = as.matrix(as.data.frame(bact_pop)), pop_size = pop_size,
        x = x, time = time, param = c(size0  = size0,
+                                     x0     = x0,
                                      sigma0 = sigma0,
                                      pm     = pm,
                                      p0     = p0,
@@ -494,7 +454,7 @@ resample <- function(out, n_time, n_x = NULL) {
 
 Solving one example (takes 7"):
 
-```{r cache = TRUE}
+```{r cache = FALSE}
 x <- seq2(-.5, 1.5)
 time <- seq(0, 300, .1)
 size0 <- 2.5
@@ -713,7 +673,7 @@ par(opar)
 
 ## Exploring the effect of initial variability in absence of mutation
 
-```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
+```{r}
 x <- seq2(-.5, 1.5)
 time <- seq(0, 300, .1)
 size0 <- 2.5
@@ -730,31 +690,11 @@ eps <- .01
 
 sim0 <- simulator(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
   log_transform()
-sim1 <- simulator(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
+sim1 <- simulator(size0, x0, 0, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
   log_transform()
 
-
-opar <- par(mfrow = c(3, 1), plt = c(.15, .98, .24, .95), cex = 1)
-
-x <- mutation$time
-
-y1 <- log10(mutation$pop_size)
-y2 <- log10(no_mutation$pop_size)
-plotllog(x, y1, log = 1:2, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "log10(population size)")
-lines2(x, y2)
-
-y1 <- mean_resistance(mutation)
-y2 <- mean_resistance(no_mutation)
-plotllog(x, y1, log = 1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "mean level of resistance")
-lines2(x, y2)
-
-y1 <- resistance_variance(mutation)
-y2 <- resistance_variance(no_mutation)
-plotllog(x, y1, log = 1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "variance of resistance")
-lines2(x, y2)
-
-par(opar)
+plotllog(sim0$time, sim0$pop_size, log = 1, ylim = c(0, 4),
+         xlab = "time", ylab = "population size")
+lines2(sim1$time, sim1$pop_size)
 ```
+
