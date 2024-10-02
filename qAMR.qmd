@@ -429,9 +429,13 @@ A function that log-transforms the time of a simulator's output:
 
 ```{r}
 log_transform <- function(out) {
-  out$bact_pop <- out$bact_pop[, -1]
-  out$time <- log10(out$time[-1])
-  out$pop_size <- out$pop_size[-1]
+  if (all(out$time > 0)) {
+    out$time <- log10(out$time)
+  } else {
+    out$time <- log10(out$time[-1])
+    out$pop_size <- out$pop_size[-1]
+    out$bact_pop <- out$bact_pop[, -1]
+  }
   out
 }
 ```
