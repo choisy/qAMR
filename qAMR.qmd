@@ -29,7 +29,13 @@ library(purrr)
 ```
 
 
-## Functions
+## Parameters and functions
+
+Parameters:
+
+```{r}
+lwd_val <- 4
+```
 
 A few utility functions.
 
@@ -52,11 +58,13 @@ polygon5 <- function(x, y, ...) polygon2(c(tail(x, 1), x), c(y[1], y), ...)
 ```
 
 ```{r}
-plotl <- function(..., lwd = 4, col = 4) plot(..., type = "l", lwd = lwd, col = col)
+plotl <- function(..., lwd = lwd_val, col = 4) {
+  plot(..., type = "l", lwd = lwd, col = col)
+}
 ```
 
 ```{r}
-lines2 <- function(..., lwd = 4, col = 2) lines(..., lwd = lwd, col = col)
+lines2 <- function(..., lwd = lwd_val, col = 2) lines(..., lwd = lwd, col = col)
 ```
 
 ```{r}
@@ -97,6 +105,30 @@ add_ticks <- function() {
   axis(1, log10(at2), NA, tcl = -.25)
   axis(2)
 }
+```
+
+```{r}
+plotllog <- function(...) {
+  plotl(..., axes = FALSE)
+  add_ticks()
+}
+```
+
+```{r}
+approx2 <- function(...) {
+  approx(...) |> 
+    as.data.frame() |> 
+    na.exclude() |> 
+    arrange(x)
+}
+```
+
+Colors:
+
+```{r}
+colS <- rgb2(8, 146, 6)
+colI <- rgb2(255, 147, 1)
+colR <- rgb2(255, 63, 30)
 ```
 
 
@@ -200,6 +232,8 @@ $$
 f_x(y) = \frac{\mathcal{R}_0(y) - \mathcal{R}_0(x)}{\mathcal{R}_0(x)}
 $$
 
+The first derivative of R0:
+
 $$
 \frac{d\mathcal{R}_0}{dx} = \frac{k_0\log(1 + \theta)}{\left(\mu + \frac{k_0}{(1 + \theta)^x}\right)(1 + \theta)^x} - \frac{\left(\frac{p_m}{p_0} - 1\right)\log(\Delta)\Delta^x}{1 + \left(\frac{p_m}{p_0} - 1\right)\Delta^x}
 $$
@@ -233,50 +267,46 @@ R_evol_level <- function(k0, k1, p1, p0, pm, mu, interval = c(-10, 10), ...) {
 }
 ```
 
+A function that plots the value of R0 with and without drugs:
+
+```{r}
+plot_R0 <- function(k0 = 10, k1 = .1, pm = 10, p0 = 9.5, p1 = 4.75, mu = .95,
+                    x = seq2(-1, 2)) {
+  R0_drug <- R0(x, k0, k1, pm, p0, p1, mu)
+  R0_nodrug <- R0(x, 0, 0, pm, p0, p1, mu)
+  xStar <- R_evol_level(k0, k1, p1, p0, pm, mu)
+  R0max <- max(R0_drug)
+  
+  xmin <- min(x)
+  xmax <- max(x)
+  ymax <- 1.04 * max(R0_nodrug)
+  
+  plot(x, R0_nodrug, ylim = c(0, ymax), type = "n", axes = FALSE, yaxs = "i",
+       xlab = "level of resistance", ylab = "R0")
+  
+  rect2(xmin, -1, 0, ymax, col = colS)
+  rect2(0, -1, 1, ymax, col = colI)
+  rect2(1, -1, xmax, ymax, col = colR)
+  
+  abline(h = 1, lwd = 4, lty = 3)
+  
+  lines2(x, R0_drug)
+  lines2(x, R0_nodrug, col = 4)
+  
+  segments(xStar, -1, xStar, R0max, col = 2)
+  segments(-1, R0max, xStar, R0max, col = 2)
+  
+  points(xStar, R0max, cex = 1.5, pch = 19, col = 2)
+  points(min(x), max(R0_nodrug), cex = 1.5, pch = 19, col = 4)
+  
+  axis(1); axis(2)
+}
+```
+
 Plot of R0:
 
 ```{r}
-x <- seq2(-1, 2)
-
-k0 <- 10
-k1 <- .1
-pm <- 10
-p0 <- 9.5
-p1 <- 4.75
-mu <- .95
-
-R0_drug <- R0(x, k0, k1, pm, p0, p1, mu)
-R0_nodrug <- R0(x, 0, 0, pm, p0, p1, mu)
-xStar <- R_evol_level(k0, k1, p1, p0, pm, mu)
-R0max <- max(R0_drug)
-
-xmin <- min(x)
-xmax <- max(x)
-ymax <- 1.04 * max(R0_nodrug)
-
-colS <- rgb2(8, 146, 6)
-colI <- rgb2(255, 147, 1)
-colR <- rgb2(255, 63, 30)
-
-plot(x, R0_nodrug, ylim = c(0, ymax), type = "n", axes = FALSE, yaxs = "i",
-     xlab = "level of resistance", ylab = "R0")
-
-rect2(xmin, -1, 0, ymax, col = colS)
-rect2(0, -1, 1, ymax, col = colI)
-rect2(1, -1, xmax, ymax, col = colR)
-
-abline(h = 1, lwd = 4, lty = 3)
-
-lines2(x, R0_drug)
-lines2(x, R0_nodrug, col = 4)
-
-segments(xStar, -1, xStar, R0max, col = 2)
-segments(-1, R0max, xStar, R0max, col = 2)
-
-points(xStar, R0max, cex = 1.5, pch = 19, col = 2)
-points(min(x), max(R0_nodrug), cex = 1.5, pch = 19, col = 4)
-
-axis(1); axis(2)
+plot_R0()
 ```
 
 A function that numerically integrates the integro-differential equation of the model:
@@ -285,21 +315,30 @@ A function that numerically integrates the integro-differential equation of the 
 simulator <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {
   dt <- diff(time)
   dx <- mean(diff(x))
-  
-  A <- 2 * eps^2
-  B <- sqrt(pi * A)
-  J <- purrr::map(x, ~ exp(-(.x - x)^2 / A) / B)
   ps <- p(x, pm, p0, p1)
   ks <- k(x, k0, k1)
   
+  if (eps > 0) {
+    A <- 2 * eps^2
+    B <- sqrt(pi * A)
+    J <- map(x, ~ exp(-(.x - x)^2 / A) / B)
+    update_bact_pop <- function(bact_pop, pop_size) {
+      L <- map_dbl(J, ~ sum(.x * ps * bact_pop)) * dx / (1 + pop_size)^alpha
+      (bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
+    }
+  } else {
+    update_bact_pop <- function(bact_pop, pop_size) {
+      L <- ps * bact_pop / (1 + pop_size)^alpha
+      (bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
+    }
+  }
+
   distribution <- dnorm(x, 0, sigma0)
   mr_bact_pop <- size0 * distribution / sum(distribution)
   bact_pop <- list(mr_bact_pop)
   mr_pop_size <- pop_size <- sum(mr_bact_pop)
-  
   for (dt_val in dt) {
-    L <- purrr::map_dbl(J, ~ sum(.x * ps * mr_bact_pop)) * dx / (1 + mr_pop_size)^alpha
-    mr_bact_pop <- (mr_bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
+    mr_bact_pop <- update_bact_pop(mr_bact_pop, mr_pop_size)
     bact_pop <- c(bact_pop, list(mr_bact_pop))
     mr_pop_size <- sum(mr_bact_pop)
     pop_size <- c(pop_size, mr_pop_size)
@@ -318,6 +357,7 @@ simulator <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time
                                      eps    = eps))
 }
 ```
+
 
 The mean level of resistance:
 
@@ -428,9 +468,7 @@ out3D <- resample(out2, 100)
 A 2D visualization (takes 0.5"):
 
 ```{r}
-with(out2D, image(time, x, bact_pop, bty = "o",
-#                  col = hcl.colors(12, "YlOrRd", rev = TRUE),
-                  col = plot3D::jet.col(),
+with(out2D, image(time, x, bact_pop, bty = "o", col = plot3D::jet.col(),
                   xlab = "log10(time)", ylab = "level of resistance"))
 ```
 
@@ -445,18 +483,22 @@ with(out3D, plot3D::persp3D(time, x, bact_pop, theta = -45, phi = 15, r = 10 * s
 Plotting the bacterial population size as a function of time:
 
 ```{r}
-with(out2, plotl(time, log10(pop_size), xaxs = "i", axes = FALSE,
-                 xlab = "time", ylab = "log10(population size)"))
-add_ticks()
+with(out2, plotllog(time, log10(pop_size), xaxs = "i",
+                    xlab = "time", ylab = "log10(population size)"))
 ```
 
 Plotting the mean resistance as a function of time:
 
 ```{r}
-plotl(out2$time, mean_resistance(out2), axes = FALSE,
-      xlab = "time", ylab = "mean level of resistance")
+plotllog(out2$time, mean_resistance(out2),
+         xlab = "time", ylab = "mean level of resistance")
+```
 
-add_ticks()
+Potting the variance of resistance as a function of time:
+
+```{r}
+plotllog(out2$time, resistance_variance(out2),
+         xlab = "log10(time)", ylab = "variance of resistance")
 ```
 
 
@@ -464,13 +506,26 @@ add_ticks()
 
 The fitness cost-benefice of resistance:
 
+$$
+c_b = \frac{\log\Delta}{\log(1 + \theta)}
+$$
+
+The corresponding R function:
+
 ```{r}
 cb <- function(p, k, mu) {
   k * pm / ((mu + k) * (pm - p))
 }
 ```
 
-The efficacy of the drug:
+The efficacy of the drug relative to the natural death rate of the bacteria (including
+everything (immune system, etc...) but the drug):
+
+$$
+\frac{k(x)}{\mu(x)}
+$$
+
+The corresponding R function:
 
 ```{r}
 k_mu <- function(cb, pm, mu) {
@@ -479,106 +534,67 @@ k_mu <- function(cb, pm, mu) {
 }
 ```
 
-Figure 4:
+A function that plots figure 4:
 
 ```{r}
-# p02 <- p0
-p02 <- 7
-cb_max <- 4
-veps <- .001
-
-mu_val <- seq(veps, 1000, veps)
-cb_val <- seq2(0, 25)
-cb0 <- cb(p02, k0, mu_val)
-cb1 <- cb(p1, k1, mu_val)
-y0 <- c(0, k0 / mu_val)
-y1 <- c(0, k1 / mu_val)
-cb0 <- c(0, cb0)
-cb1 <- c(0, cb1)
-
-cbs <- seq2(0, cb_max)
-
-line_green <- data.frame(x = cbs, y = approx(cb0, y0, cbs)$y) |> 
-  na.exclude() |> 
-  arrange(x)
-
-line_red <- data.frame(x = cbs, y = approx(cb1, y1, cbs)$y) |> 
-  na.exclude() |> 
-  arrange(x)
-
-line_black <- data.frame(x = cbs, y = approx(cb_val, k_mu(cb_val, pm, mu), cbs)$y) |> 
-  na.exclude() |> 
-  arrange(x)
-
-Xintersect <- function(df) {
-  df |>
-    left_join(line_black, by = "x") |> 
-    filter(y.x > y.y) |> 
-    pull(x) |>
-    head(1)
+figure4 <- function(pm, p0, p1, k0, k1, mu,
+                    cb_max = 4, veps = .001, nb_mu_val = 1000, max_cv_val = 25, ...) {
+# 1. Preparing the data: ##############################################################
+  mu_val <- seq(veps, nb_mu_val, veps)
+  cb_val <- seq2(0, max_cv_val)
+  cb0 <- cb(p0, k0, mu_val)
+  cb1 <- cb(p1, k1, mu_val)
+  y0 <- c(0, k0 / mu_val)
+  y1 <- c(0, k1 / mu_val)
+  cb0 <- c(0, cb0)
+  cb1 <- c(0, cb1)
+  
+  cbs <- seq2(0, cb_max)
+  
+  line_green <- approx2(cb0, y0, cbs)
+  line_red <- approx2(cb1, y1, cbs)
+  line_black <- approx2(cb_val, k_mu(cb_val, pm, mu), cbs)
+    
+  Xintersect <- function(df) {
+    df |>
+      left_join(line_black, by = "x") |> 
+      filter(y.x > y.y) |> 
+      pull(x) |>
+      head(1)
+  }
+  
+  Xintersect0 <- Xintersect(line_green)
+  Xintersect1 <- Xintersect(line_red)
+  
+# 2. Making the figure: ###############################################################
+  
+  plot(NA, xaxs = "i", yaxs = "i", bty = "o",
+       xlab = "cost / benefit of resistance", ylab = "drug efficacy", ...)
+  
+  full_join(line_black, line_green, by = "x") |>
+    mutate(y = map2_dbl(y.x, y.y, min, na.rm = TRUE)) |> 
+    with(polygon3(x, y, col = colS, alpha = 1))
+  polygon2(c(line_green$x, rev(line_red$x)), c(line_green$y, rev(line_red$y)),
+           col = colI)
+  with(line_red, polygon4(x, y, col = colR))
+  with(line_black, polygon5(x, y, col = "lightgrey"))
+  
+  with(filter(line_red, x < Xintersect1), lines2(x, y))
+  with(filter(line_red, x > Xintersect1), lines2(x, y, lty = 3))
+  with(filter(line_green, x < Xintersect0), lines2(x, y, col = 3))
+  with(filter(line_green, x > Xintersect0), lines2(x, y, col = 3, lty = 3))
+  abline(v = 1 / c(1 - p1 / pm, 1 - p0 / pm), col = 2:3)
+  with(line_black, lines2(x, y, col = 1)) 
 }
+```
 
-Xintersect0 <- Xintersect(line_green)
-Xintersect1 <- Xintersect(line_red)
+An example of figure 4:
 
-#######################################################################################
-
-plot(NA, xlim = c(0, 4), ylim = c(0, 3), xaxs = "i", yaxs = "i", bty = "o",
-     xlab = "cost / benefit of resistance", ylab = "drug efficacy")
-
-full_join(line_black, line_green, by = "x") |>
-  mutate(y = map2_dbl(y.x, y.y, min, na.rm = TRUE)) |> 
-  with(polygon3(x, y, col = colS, alpha = 1))
-polygon(c(line_green$x, rev(line_red$x)), c(line_green$y, rev(line_red$y)), col = colI,
-        border = NA)
-with(line_red, polygon4(x, y, col = colR))
-with(line_black, polygon5(x, y, col = "lightgrey"))
-
-with(filter(line_red, x < Xintersect1), lines2(x, y))
-with(filter(line_red, x > Xintersect1), lines2(x, y, lty = 3))
-with(filter(line_green, x < Xintersect0), lines2(x, y, col = 3))
-with(filter(line_green, x > Xintersect0), lines2(x, y, col = 3, lty = 3))
-abline(v = 1 / c(1 - p1 / pm, 1 - p02 / pm), col = 2:3)
-with(line_black, lines2(x, y, col = 1))
+```{r}
+figure4(pm, p0 = 7, p1, k0, k1, mu, xlim = c(0, 4), ylim = c(0, 3))
 ```
 
 ## Exploring the effect of speed of evolution
-
-A version of the simulator without any mutation:
-
-```{r}
-simulator_no_mut <- function(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, x, time) {
-  dt <- diff(time)
-  dx <- mean(diff(x))
-  
-  ps <- p(x, pm, p0, p1)
-  ks <- k(x, k0, k1)
-  
-  distribution <- dnorm(x, 0, sigma0)
-  mr_bact_pop <- size0 * distribution / sum(distribution)
-  bact_pop <- list(mr_bact_pop)
-  mr_pop_size <- pop_size <- sum(mr_bact_pop)
-  
-  for (dt_val in dt) {
-    L <- ps * mr_bact_pop / (1 + mr_pop_size)^alpha
-    mr_bact_pop <- (mr_bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
-    bact_pop <- c(bact_pop, list(mr_bact_pop))
-    mr_pop_size <- sum(mr_bact_pop)
-    pop_size <- c(pop_size, mr_pop_size)
-  }
-  
-  list(bact_pop = as.matrix(as.data.frame(bact_pop)), pop_size = pop_size,
-       x = x, time = time, param = c(size0  = size0,
-                                     sigma0 = sigma0,
-                                     pm     = pm,
-                                     p0     = p0,
-                                     p1     = p1,
-                                     k0     = k0,
-                                     k1     = k1,
-                                     alpha  = alpha,
-                                     mu     = mu))
-}
-```
 
 Comparing with and without mutation:
 
@@ -597,7 +613,7 @@ alpha <- 1
 eps <- .01
 
 mutation <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
-no_mutation <- simulator_no_mut(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, x, time)
+no_mutation <- simulator(size0, sigma0, pm, p0, p1, k0, k1, alpha, mu, 0, x, time)
 
 with(mutation, plotl(log10(time[-1]), log10(pop_size[-1]), xaxs = "i",
                 xlab = "log10(time)", ylab = "log10(population size)"))
