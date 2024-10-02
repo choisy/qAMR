@@ -748,3 +748,50 @@ lines2(x, y2)
 
 par(opar)
 ```
+
+## No drug, no mutation
+
+```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
+x <- seq2(-.5, 1.5)
+time <- seq(0, 300, .1)
+size0 <- 2.5
+x0 <- 0
+sigma0 <- .05
+k0 <- 10
+k1 <- .1
+pm <- 10
+p0 <- 9.5
+p1 <- 4.75
+mu <- .95
+alpha <- 1
+eps <- .01
+
+sim0 <- simulator(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
+  log_transform()
+sim1 <- simulator(size0, x0, sigma0, pm, p0, p1, 0, 0, alpha, mu, 0, x, time) |> 
+  log_transform()
+
+opar <- par(mfrow = c(3, 1), plt = c(.15, .98, .24, .95), cex = 1)
+
+x <- sim0$time
+
+y1 <- sim0$pop_size
+y2 <- sim1$pop_size
+plotllog1(x, y1, ylim = range(c(y1, y2)),
+         xlab = "time", ylab = "population size")
+lines2(x, y2)
+
+y1 <- mean_resistance(sim0)
+y2 <- mean_resistance(sim1)
+plotllog1(x, y1, ylim = range(c(y1, y2)),
+         xlab = "time", ylab = "mean level of resistance")
+lines2(x, y2)
+
+y1 <- resistance_variance(sim0)
+y2 <- resistance_variance(sim1)
+plotllog1(x, y1, ylim = range(c(y1, y2)),
+         xlab = "time", ylab = "variance of resistance")
+lines2(x, y2)
+
+par(opar)
+```
