@@ -559,41 +559,23 @@ f_x(y) = \frac{\mathcal{R}_0(y) - \mathcal{R}_0(x)}{\mathcal{R}_0(x)}
 </div>
 </div>
 </div>
-<p>Plotting the bacterial population size as a function of time:</p>
+<p>Plotting the bacterial population size, the mean resistance, and the variance of resistance as a function of time:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out2, <span class="fu">plotllog</span>(time, <span class="fu">log10</span>(pop_size), <span class="at">xaxs =</span> <span class="st">"i"</span>,</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"log10(population size)"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>opar <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>), <span class="at">plt =</span> <span class="fu">c</span>(.<span class="dv">15</span>, .<span class="dv">98</span>, .<span class="dv">24</span>, .<span class="dv">95</span>), <span class="at">cex =</span> <span class="dv">1</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(out2, <span class="fu">plotllog</span>(time, <span class="fu">log10</span>(pop_size), <span class="at">xaxs =</span> <span class="st">"i"</span>,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"log10(population size)"</span>))</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plotllog</span>(out2<span class="sc">$</span>time, <span class="fu">mean_resistance</span>(out2),</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"mean level of resistance"</span>)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotllog</span>(out2<span class="sc">$</span>time, <span class="fu">resistance_variance</span>(out2),</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"variance of resistance"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="336"></p>
 </figure>
 </div>
 </div>
-</div>
-<p>Plotting the mean resistance as a function of time:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotllog</span>(out2<span class="sc">$</span>time, <span class="fu">mean_resistance</span>(out2),</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">xlab =</span> <span class="st">"time"</span>, <span class="at">ylab =</span> <span class="st">"mean level of resistance"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Potting the variance of resistance as a function of time:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotllog</span>(out2<span class="sc">$</span>time, <span class="fu">resistance_variance</span>(out2),</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">xlab =</span> <span class="st">"log10(time)"</span>, <span class="at">ylab =</span> <span class="st">"variance of resistance"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(opar)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="treatment-outpout" class="level2">
@@ -604,9 +586,9 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 \]</span></p>
 <p>The corresponding R function:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>cb <span class="ot">&lt;-</span> <span class="cf">function</span>(p, k, mu) {</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  k <span class="sc">*</span> pm <span class="sc">/</span> ((mu <span class="sc">+</span> k) <span class="sc">*</span> (pm <span class="sc">-</span> p))</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>cb <span class="ot">&lt;-</span> <span class="cf">function</span>(p, k, mu) {</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  k <span class="sc">*</span> pm <span class="sc">/</span> ((mu <span class="sc">+</span> k) <span class="sc">*</span> (pm <span class="sc">-</span> p))</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The efficacy of the drug relative to the natural death rate of the bacteria (including everything (immune system, etc…) but the drug):</p>
 <p><span class="math display">\[
@@ -614,62 +596,67 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 \]</span></p>
 <p>The corresponding R function:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>k_mu <span class="ot">&lt;-</span> <span class="cf">function</span>(cb, pm, mu) {</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  gamma <span class="ot">&lt;-</span> pm <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> cb) <span class="sc">/</span> <span class="dv">2</span> <span class="sc">-</span> mu</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  (gamma <span class="sc">+</span> <span class="fu">sqrt</span>(gamma<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> mu <span class="sc">*</span> (pm <span class="sc">-</span> mu))) <span class="sc">/</span> mu</span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>k_mu <span class="ot">&lt;-</span> <span class="cf">function</span>(cb, pm, mu) {</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  gamma <span class="ot">&lt;-</span> pm <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> cb) <span class="sc">/</span> <span class="dv">2</span> <span class="sc">-</span> mu</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  (gamma <span class="sc">+</span> <span class="fu">sqrt</span>(gamma<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> mu <span class="sc">*</span> (pm <span class="sc">-</span> mu))) <span class="sc">/</span> mu</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A function that prepares the data for figure 4:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>figure4prepare <span class="ot">&lt;-</span> <span class="cf">function</span>(pm, p0, p1, k0, k1, mu,</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>                                cb_max, veps, nb_mu_val, max_cv_val) {</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  mu_val <span class="ot">&lt;-</span> <span class="fu">seq</span>(veps, nb_mu_val, veps)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  cb_val <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, max_cv_val)</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  cb0 <span class="ot">&lt;-</span> <span class="fu">cb</span>(p0, k0, mu_val)</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  cb1 <span class="ot">&lt;-</span> <span class="fu">cb</span>(p1, k1, mu_val)</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  y0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, k0 <span class="sc">/</span> mu_val)</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  y1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, k1 <span class="sc">/</span> mu_val)</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>  cb0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, cb0)</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>  cb1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, cb1)</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>  cbs <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, cb_max)</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>  line_green <span class="ot">&lt;-</span> <span class="fu">approx2</span>(cb0, y0, cbs)</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>  line_red <span class="ot">&lt;-</span> <span class="fu">approx2</span>(cb1, y1, cbs)</span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>  line_black <span class="ot">&lt;-</span> <span class="fu">approx2</span>(cb_val, <span class="fu">k_mu</span>(cb_val, pm, mu), cbs)</span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>  Xintersect <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>    df <span class="sc">|&gt;</span></span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(line_black, <span class="at">by =</span> <span class="st">"x"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(y.x <span class="sc">&gt;</span> y.y) <span class="sc">|&gt;</span> </span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pull</span>(x) <span class="sc">|&gt;</span></span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">head</span>(<span class="dv">1</span>)</span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">line_green =</span> line_green, <span class="at">line_red =</span> line_red, <span class="at">line_black =</span> line_black,</span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">Xintersect0 =</span> <span class="fu">Xintersect</span>(line_green), <span class="at">Xintersect1 =</span> <span class="fu">Xintersect</span>(line_red))</span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>A function that plots figure 4:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>figure4 <span class="ot">&lt;-</span> <span class="cf">function</span>(pm, p0, p1, k0, k1, mu,</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cb_max =</span> <span class="dv">4</span>, <span class="at">veps =</span> .<span class="dv">001</span>, <span class="at">nb_mu_val =</span> <span class="dv">1000</span>, <span class="at">max_cv_val =</span> <span class="dv">25</span>, ...) {</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Preparing the data: ##############################################################</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  mu_val <span class="ot">&lt;-</span> <span class="fu">seq</span>(veps, nb_mu_val, veps)</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  cb_val <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, max_cv_val)</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  cb0 <span class="ot">&lt;-</span> <span class="fu">cb</span>(p0, k0, mu_val)</span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  cb1 <span class="ot">&lt;-</span> <span class="fu">cb</span>(p1, k1, mu_val)</span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  y0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, k0 <span class="sc">/</span> mu_val)</span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  y1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, k1 <span class="sc">/</span> mu_val)</span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  cb0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, cb0)</span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>  cb1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, cb1)</span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>  cbs <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, cb_max)</span>
-<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>  line_green <span class="ot">&lt;-</span> <span class="fu">approx2</span>(cb0, y0, cbs)</span>
-<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>  line_red <span class="ot">&lt;-</span> <span class="fu">approx2</span>(cb1, y1, cbs)</span>
-<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>  line_black <span class="ot">&lt;-</span> <span class="fu">approx2</span>(cb_val, <span class="fu">k_mu</span>(cb_val, pm, mu), cbs)</span>
-<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>  Xintersect <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
-<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>    df <span class="sc">|&gt;</span></span>
-<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(line_black, <span class="at">by =</span> <span class="st">"x"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(y.x <span class="sc">&gt;</span> y.y) <span class="sc">|&gt;</span> </span>
-<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pull</span>(x) <span class="sc">|&gt;</span></span>
-<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">head</span>(<span class="dv">1</span>)</span>
-<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>  Xintersect0 <span class="ot">&lt;-</span> <span class="fu">Xintersect</span>(line_green)</span>
-<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>  Xintersect1 <span class="ot">&lt;-</span> <span class="fu">Xintersect</span>(line_red)</span>
-<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Making the figure: ###############################################################</span></span>
-<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>, <span class="at">bty =</span> <span class="st">"o"</span>,</span>
-<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"cost / benefit of resistance"</span>, <span class="at">ylab =</span> <span class="st">"drug efficacy"</span>, ...)</span>
-<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(line_black, line_green, <span class="at">by =</span> <span class="st">"x"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">y =</span> <span class="fu">map2_dbl</span>(y.x, y.y, min, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>(<span class="fu">polygon3</span>(x, y, <span class="at">col =</span> colS, <span class="at">alpha =</span> <span class="dv">1</span>))</span>
-<span id="cb45-38"><a href="#cb45-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon2</span>(<span class="fu">c</span>(line_green<span class="sc">$</span>x, <span class="fu">rev</span>(line_red<span class="sc">$</span>x)), <span class="fu">c</span>(line_green<span class="sc">$</span>y, <span class="fu">rev</span>(line_red<span class="sc">$</span>y)),</span>
-<span id="cb45-39"><a href="#cb45-39" aria-hidden="true" tabindex="-1"></a>           <span class="at">col =</span> colI)</span>
-<span id="cb45-40"><a href="#cb45-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(line_red, <span class="fu">polygon4</span>(x, y, <span class="at">col =</span> colR))</span>
-<span id="cb45-41"><a href="#cb45-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(line_black, <span class="fu">polygon5</span>(x, y, <span class="at">col =</span> <span class="st">"lightgrey"</span>))</span>
-<span id="cb45-42"><a href="#cb45-42" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb45-43"><a href="#cb45-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">filter</span>(line_red, x <span class="sc">&lt;</span> Xintersect1), <span class="fu">lines2</span>(x, y))</span>
-<span id="cb45-44"><a href="#cb45-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">filter</span>(line_red, x <span class="sc">&gt;</span> Xintersect1), <span class="fu">lines2</span>(x, y, <span class="at">lty =</span> <span class="dv">3</span>))</span>
-<span id="cb45-45"><a href="#cb45-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">filter</span>(line_green, x <span class="sc">&lt;</span> Xintersect0), <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">3</span>))</span>
-<span id="cb45-46"><a href="#cb45-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">filter</span>(line_green, x <span class="sc">&gt;</span> Xintersect0), <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">3</span>, <span class="at">lty =</span> <span class="dv">3</span>))</span>
-<span id="cb45-47"><a href="#cb45-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">-</span> p1 <span class="sc">/</span> pm, <span class="dv">1</span> <span class="sc">-</span> p0 <span class="sc">/</span> pm), <span class="at">col =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>)</span>
-<span id="cb45-48"><a href="#cb45-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(line_black, <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">1</span>)) </span>
-<span id="cb45-49"><a href="#cb45-49" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>, <span class="at">bty =</span> <span class="st">"o"</span>,</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"cost / benefit of resistance"</span>, <span class="at">ylab =</span> <span class="st">"drug efficacy"</span>, ...)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">figure4prepare</span>(pm, p0, p1, k0, k1, mu, cb_max, veps, nb_mu_val, max_cv_val) <span class="sc">|&gt;</span> </span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">with</span>({</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">full_join</span>(line_black, line_green, <span class="at">by =</span> <span class="st">"x"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">y =</span> <span class="fu">map2_dbl</span>(y.x, y.y, min, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>        <span class="fu">with</span>(<span class="fu">polygon3</span>(x, y, <span class="at">col =</span> colS, <span class="at">alpha =</span> <span class="dv">1</span>))</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">polygon2</span>(<span class="fu">c</span>(line_green<span class="sc">$</span>x, <span class="fu">rev</span>(line_red<span class="sc">$</span>x)), <span class="fu">c</span>(line_green<span class="sc">$</span>y, <span class="fu">rev</span>(line_red<span class="sc">$</span>y)),</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">col =</span> colI)</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">with</span>(line_red, <span class="fu">polygon4</span>(x, y, <span class="at">col =</span> colR))</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">with</span>(line_black, <span class="fu">polygon5</span>(x, y, <span class="at">col =</span> <span class="st">"lightgrey"</span>))</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">-</span> p1 <span class="sc">/</span> pm, <span class="dv">1</span> <span class="sc">-</span> p0 <span class="sc">/</span> pm), <span class="at">col =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">with</span>(<span class="fu">filter</span>(line_red, x <span class="sc">&lt;</span> Xintersect1), <span class="fu">lines2</span>(x, y))</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">with</span>(<span class="fu">filter</span>(line_red, x <span class="sc">&gt;</span> Xintersect1), <span class="fu">lines2</span>(x, y, <span class="at">lty =</span> <span class="dv">3</span>))</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">with</span>(<span class="fu">filter</span>(line_green, x <span class="sc">&lt;</span> Xintersect0), <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">3</span>))</span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">with</span>(<span class="fu">filter</span>(line_green, x <span class="sc">&gt;</span> Xintersect0), <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">3</span>, <span class="at">lty =</span> <span class="dv">3</span>))</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">with</span>(line_black, <span class="fu">lines2</span>(x, y, <span class="at">col =</span> <span class="dv">1</span>)) </span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>An example of figure 4:</p>
 <div class="cell">
@@ -677,7 +664,7 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -709,7 +696,7 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -719,7 +706,7 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-47-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-46-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -729,7 +716,7 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-47-3.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-46-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>

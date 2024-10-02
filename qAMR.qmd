@@ -480,25 +480,18 @@ with(out3D, plot3D::persp3D(time, x, bact_pop, theta = -45, phi = 15, r = 10 * s
                             alpha = 1, image = TRUE, zlim = c(-.1, .1)))
 ```
 
-Plotting the bacterial population size as a function of time:
+Plotting the bacterial population size, the mean resistance, and the variance of
+resistance as a function of time:
 
-```{r}
+```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
+opar <- par(mfrow = c(3, 1), plt = c(.15, .98, .24, .95), cex = 1)
 with(out2, plotllog(time, log10(pop_size), xaxs = "i",
                     xlab = "time", ylab = "log10(population size)"))
-```
-
-Plotting the mean resistance as a function of time:
-
-```{r}
 plotllog(out2$time, mean_resistance(out2),
          xlab = "time", ylab = "mean level of resistance")
-```
-
-Potting the variance of resistance as a function of time:
-
-```{r}
 plotllog(out2$time, resistance_variance(out2),
-         xlab = "log10(time)", ylab = "variance of resistance")
+         xlab = "time", ylab = "variance of resistance")
+par(opar)
 ```
 
 
@@ -534,12 +527,11 @@ k_mu <- function(cb, pm, mu) {
 }
 ```
 
-A function that plots figure 4:
+A function that prepares the data for figure 4:
 
 ```{r}
-figure4 <- function(pm, p0, p1, k0, k1, mu,
-                    cb_max = 4, veps = .001, nb_mu_val = 1000, max_cv_val = 25, ...) {
-# 1. Preparing the data: ##############################################################
+figure4prepare <- function(pm, p0, p1, k0, k1, mu,
+                                cb_max, veps, nb_mu_val, max_cv_val) {
   mu_val <- seq(veps, nb_mu_val, veps)
   cb_val <- seq2(0, max_cv_val)
   cb0 <- cb(p0, k0, mu_val)
@@ -563,28 +555,36 @@ figure4 <- function(pm, p0, p1, k0, k1, mu,
       head(1)
   }
   
-  Xintersect0 <- Xintersect(line_green)
-  Xintersect1 <- Xintersect(line_red)
-  
-# 2. Making the figure: ###############################################################
-  
+  list(line_green = line_green, line_red = line_red, line_black = line_black,
+       Xintersect0 = Xintersect(line_green), Xintersect1 = Xintersect(line_red))
+}
+```
+
+A function that plots figure 4:
+
+```{r}
+figure4 <- function(pm, p0, p1, k0, k1, mu,
+                    cb_max = 4, veps = .001, nb_mu_val = 1000, max_cv_val = 25, ...) {
+
   plot(NA, xaxs = "i", yaxs = "i", bty = "o",
        xlab = "cost / benefit of resistance", ylab = "drug efficacy", ...)
   
-  full_join(line_black, line_green, by = "x") |>
-    mutate(y = map2_dbl(y.x, y.y, min, na.rm = TRUE)) |> 
-    with(polygon3(x, y, col = colS, alpha = 1))
-  polygon2(c(line_green$x, rev(line_red$x)), c(line_green$y, rev(line_red$y)),
-           col = colI)
-  with(line_red, polygon4(x, y, col = colR))
-  with(line_black, polygon5(x, y, col = "lightgrey"))
-  
-  with(filter(line_red, x < Xintersect1), lines2(x, y))
-  with(filter(line_red, x > Xintersect1), lines2(x, y, lty = 3))
-  with(filter(line_green, x < Xintersect0), lines2(x, y, col = 3))
-  with(filter(line_green, x > Xintersect0), lines2(x, y, col = 3, lty = 3))
-  abline(v = 1 / c(1 - p1 / pm, 1 - p0 / pm), col = 2:3)
-  with(line_black, lines2(x, y, col = 1)) 
+  figure4prepare(pm, p0, p1, k0, k1, mu, cb_max, veps, nb_mu_val, max_cv_val) |> 
+    with({
+      full_join(line_black, line_green, by = "x") |>
+        mutate(y = map2_dbl(y.x, y.y, min, na.rm = TRUE)) |> 
+        with(polygon3(x, y, col = colS, alpha = 1))
+      polygon2(c(line_green$x, rev(line_red$x)), c(line_green$y, rev(line_red$y)),
+               col = colI)
+      with(line_red, polygon4(x, y, col = colR))
+      with(line_black, polygon5(x, y, col = "lightgrey"))
+      abline(v = 1 / c(1 - p1 / pm, 1 - p0 / pm), col = 2:3)
+      with(filter(line_red, x < Xintersect1), lines2(x, y))
+      with(filter(line_red, x > Xintersect1), lines2(x, y, lty = 3))
+      with(filter(line_green, x < Xintersect0), lines2(x, y, col = 3))
+      with(filter(line_green, x > Xintersect0), lines2(x, y, col = 3, lty = 3))
+      with(line_black, lines2(x, y, col = 1)) 
+    })
 }
 ```
 
@@ -593,6 +593,8 @@ An example of figure 4:
 ```{r}
 figure4(pm, p0 = 7, p1, k0, k1, mu, xlim = c(0, 4), ylim = c(0, 3))
 ```
+
+
 
 ## Exploring the effect of speed of evolution
 
