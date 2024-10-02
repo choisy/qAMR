@@ -464,7 +464,7 @@ Solving one example (takes 7"):
 
 ```{r cache = FALSE}
 x <- seq2(-.5, 1.5)
-time <- seq(0, 300, .1)
+time <- seq(1, 300, .1)
 size0 <- 2.5
 x0 <- 0
 sigma0 <- .05
@@ -634,7 +634,7 @@ Comparing with and without mutation:
 
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
 x <- seq2(-.5, 1.5)
-time <- seq(0, 300, .1)
+time <- seq(1, 300, .1)
 size0 <- 2.5
 x0 <- 0
 sigma0 <- .05
@@ -682,7 +682,7 @@ par(opar)
 
 ```{r}
 x <- seq2(-.5, 1.5)
-time <- seq(0, 300, .1)
+time <- seq(1, 300, .1)
 size0 <- 2.5
 x0 <- 0
 sigma0 <- .05
@@ -710,7 +710,7 @@ lines2(sim1$time, sim1$pop_size)
 
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
 x <- seq2(-.5, 1.5)
-time <- seq(0, 300, .1)
+time <- seq(1, 300, .1)
 size0 <- 2.5
 x0 <- 0
 sigma0 <- .05
@@ -757,7 +757,7 @@ par(opar)
 
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
 x <- seq2(-.5, 1.5)
-time <- seq(0, 300, .1)
+time <- seq(1, 300, .1)
 size0 <- 2.5
 x0 <- 0
 sigma0 <- .05

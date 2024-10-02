@@ -500,11 +500,15 @@ f_x(y) = \frac{\mathcal{R}_0(y) - \mathcal{R}_0(x)}{\mathcal{R}_0(x)}
 <p>A function that log-transforms the time of a simulator’s output:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>log_transform <span class="ot">&lt;-</span> <span class="cf">function</span>(out) {</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  out<span class="sc">$</span>bact_pop <span class="ot">&lt;-</span> out<span class="sc">$</span>bact_pop[, <span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  out<span class="sc">$</span>time <span class="ot">&lt;-</span> <span class="fu">log10</span>(out<span class="sc">$</span>time[<span class="sc">-</span><span class="dv">1</span>])</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  out<span class="sc">$</span>pop_size <span class="ot">&lt;-</span> out<span class="sc">$</span>pop_size[<span class="sc">-</span><span class="dv">1</span>]</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  out</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">all</span>(out<span class="sc">$</span>time <span class="sc">&gt;</span> <span class="dv">0</span>)) {</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    out<span class="sc">$</span>time <span class="ot">&lt;-</span> <span class="fu">log10</span>(out<span class="sc">$</span>time)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    out<span class="sc">$</span>time <span class="ot">&lt;-</span> <span class="fu">log10</span>(out<span class="sc">$</span>time[<span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    out<span class="sc">$</span>pop_size <span class="ot">&lt;-</span> out<span class="sc">$</span>pop_size[<span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    out<span class="sc">$</span>bact_pop <span class="ot">&lt;-</span> out<span class="sc">$</span>bact_pop[, <span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  out</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>A function that resamples time and/or x:</p>
 <div class="cell" data-layout-align="center">
@@ -527,7 +531,7 @@ f_x(y) = \frac{\mathcal{R}_0(y) - \mathcal{R}_0(x)}{\mathcal{R}_0(x)}
 <p>Solving one example (takes 7”):</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>)</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> <span class="fl">2.5</span></span>
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>sigma0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
@@ -695,7 +699,7 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 <p>Comparing with and without mutation:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>)</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> <span class="fl">2.5</span></span>
 <span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>sigma0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
@@ -748,7 +752,7 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 <h2 class="anchored" data-anchor-id="exploring-the-effect-of-initial-variability-in-absence-of-mutation">Exploring the effect of initial variability in absence of mutation</h2>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>)</span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> <span class="fl">2.5</span></span>
 <span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>sigma0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
@@ -782,7 +786,7 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 <h2 class="anchored" data-anchor-id="bacterial-dynamics-in-absence-of-drug">Bacterial dynamics in absence of drug</h2>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>)</span>
-<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
 <span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> <span class="fl">2.5</span></span>
 <span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>sigma0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
@@ -835,7 +839,7 @@ c_b = \frac{\log\Delta}{\log(1 + \theta)}
 <h2 class="anchored" data-anchor-id="no-drug-no-mutation">No drug, no mutation</h2>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span>.<span class="dv">5</span>, <span class="fl">1.5</span>)</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">300</span>, .<span class="dv">1</span>)</span>
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>size0 <span class="ot">&lt;-</span> <span class="fl">2.5</span></span>
 <span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>sigma0 <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
