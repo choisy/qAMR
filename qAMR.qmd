@@ -132,11 +132,30 @@ plotllog1 <- function(...) plotllog(..., log = 1)
 ```
 
 ```{r}
+image2 <- function(...) {
+  image(..., axes = FALSE)
+  axis_log(1)
+  axis(2)
+}
+```
+
+```{r}
 approx2 <- function(...) {
   approx(...) |> 
     as.data.frame() |> 
     na.exclude() |> 
     arrange(x)
+}
+```
+
+```{r}
+dnorm2 <- function(x, mean, sd, pr) {
+  distribution <- dnorm(x, mean, sd)
+  if (pr > 0) {
+    pr <- pr / 2
+    distribution[x < qnorm(pr, mean, sd) | qnorm(1 - pr, mean, sd) < x] <- 0
+  }
+  distribution / sum(distribution)
 }
 ```
 
@@ -329,28 +348,32 @@ plot_R0()
 A function that numerically integrates the integro-differential equation of the model:
 
 ```{r}
-simulator <- function(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) {
+convolution <- function(x, y) rowSums(x %*% t(y))
+```
+
+```{r}
+simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
+                      alpha, mu, eps, x, time) {
   dt <- diff(time)
   dx <- mean(diff(x))
   ps <- p(x, pm, p0, p1)
   ks <- k(x, k0, k1)
   
   if (sigma0 > 0) {
-    distribution <- dnorm(x, x0, sigma0)
-    mr_bact_pop <- size0 * distribution / sum(distribution)
+    mr_bact_pop <- size0 * dnorm2(x, x0, sigma0, pr)
   } else {
     x1 <- rev(seq(x0, min(x), - dx))
     x2 <- seq(x0 + dx, max(x) + dx, dx)
     x <- c(x1, x2)
     mr_bact_pop <- c(rep(0, length(x1) - 1), size0, rep(0, length(x2)))
   }
-  
+    
   if (eps > 0) {
     A <- 2 * eps^2
     B <- sqrt(pi * A)
-    J <- map(x, ~ exp(-(.x - x)^2 / A) / B)
+    J <- as.matrix(as.data.frame(map(x, ~ exp(-(.x - x)^2 / A) / B)))
     update_bact_pop <- function(bact_pop, pop_size) {
-      L <- map_dbl(J, ~ sum(.x * ps * bact_pop)) * dx / (1 + pop_size)^alpha
+      L <- colSums(J * (ps * bact_pop)) * dx / (1 + pop_size)^alpha
       (bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
     }
   } else {
@@ -369,23 +392,25 @@ simulator <- function(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, 
     pop_size <- c(pop_size, mr_pop_size)
   }
   
-  list(bact_pop = as.matrix(as.data.frame(bact_pop)), pop_size = pop_size,
-       x = x, time = time, param = c(size0  = size0,
-                                     x0     = x0,
-                                     sigma0 = sigma0,
-                                     pm     = pm,
-                                     p0     = p0,
-                                     p1     = p1,
-                                     k0     = k0,
-                                     k1     = k1,
-                                     alpha  = alpha,
-                                     mu     = mu,
-                                     eps    = eps))
+  bact_pop <- bact_popNA <- as.matrix(as.data.frame(bact_pop))
+  bact_popNA[bact_popNA == 0] <- NA
+  
+  list(bact_pop = bact_pop, bact_popNA = bact_popNA, pop_size = pop_size,
+       x = x, time = time,
+       param = c(size0  = size0,
+                 x0     = x0,
+                 sigma0 = sigma0,
+                 pr     = pr,
+                 pm     = pm,
+                 p0     = p0,
+                 p1     = p1,
+                 k0     = k0,
+                 k1     = k1,
+                 alpha  = alpha,
+                 mu     = mu,
+                 eps    = eps))
 }
 ```
-
-
-
 
 The mean level of resistance:
 
@@ -435,6 +460,7 @@ log_transform <- function(out) {
     out$time <- log10(out$time[-1])
     out$pop_size <- out$pop_size[-1]
     out$bact_pop <- out$bact_pop[, -1]
+    out$bact_popNA <- out$bact_popNA[, -1]
   }
   out
 }
@@ -450,24 +476,27 @@ resample <- function(out, n_time, n_x = NULL) {
   x <- out$x
   time2 <- out$time <- seq(min(time), max(time), le = n_time)
   x2 <- out$x <- seq(min(x), max(x), le = n_x)
-  out$bact_pop <- bact_pop |>
+  out$bact_pop <- bact_popNA <- bact_pop |>
     map(~ approx(time, .x, time2)$y) |> 
     as_transposed_dataframe() |> 
     map(~ approx(x, .x, x2)$y) |> 
     as.data.frame() |> 
     t()
+  bact_popNA[bact_popNA == 0] <- NA
+  out$bact_popNA <- bact_popNA
   out
 }
 ```
 
 Solving one example (takes 7"):
 
-```{r cache = FALSE}
+```{r}
 x <- seq2(-.5, 1.5)
 time <- seq(1, 300, .1)
 size0 <- 2.5
 x0 <- 0
 sigma0 <- .05
+pr <- .1
 k0 <- 10
 k1 <- .1
 pm <- 10
@@ -476,8 +505,15 @@ p1 <- 4.75
 mu <- .95
 alpha <- 1
 eps <- .01
+#eps <- .005
+system.time(out <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, eps, x, time))
+```
 
-out <- simulator(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
+Looking at the initial distribution and the mutation kernel:
+
+```{r}
+plotl(x, dnorm(x, 0, eps))
+lines2(x, dnorm(x, x0, sigma0))
 ```
 
 Log transforming time:
@@ -501,8 +537,13 @@ out3D <- resample(out2, 100)
 A 2D visualization (takes 0.5"):
 
 ```{r}
-with(out2D, image(time, x, bact_pop, bty = "o", col = plot3D::jet.col(),
-                  xlab = "log10(time)", ylab = "level of resistance"))
+with(out2D, image2(time, x, bact_pop, bty = "o", col = plot3D::jet.col(),
+                   xlab = "time", ylab = "level of resistance"))
+```
+
+```{r}
+with(out2D, image2(time, x, bact_popNA, bty = "o", col = plot3D::jet.col(),
+                   xlab = "time", ylab = "level of resistance"))
 ```
 
 A 3D visualization (takes 1"):
@@ -510,7 +551,12 @@ A 3D visualization (takes 1"):
 ```{r}
 with(out3D, plot3D::persp3D(time, x, bact_pop, theta = -45, phi = 15, r = 10 * sqrt(3),
                             expand = .6, box = FALSE, shade = 1, ltheta = -45,
-                            alpha = 1, image = TRUE, zlim = c(-.1, .1)))
+                            alpha = 1, image = TRUE, zlim = c(-.1, .1),
+                            colkey = list(side   = 2,
+                                          length = .37,
+                                          width  = .5,
+                                          dist   = -.11,
+                                          shift  = .13)))
 ```
 
 Plotting the bacterial population size, the mean resistance, and the variance of
@@ -630,172 +676,74 @@ figure4(pm, p0 = 7, p1, k0, k1, mu, xlim = c(0, 4), ylim = c(0, 3))
 
 ## Exploring the effect of mutation
 
+```{r}
+subplots <- function(sim0, sim1) {
+  opar <- par(mfrow = c(3, 1), plt = c(.15, .98, .24, .95), cex = 1)
+
+  xs <- sim0$time
+  
+  y1 <- sim0$pop_size
+  y2 <- sim1$pop_size
+  plotllog1(xs, y1, ylim = range(c(y1, y2)),
+            xlab = "time", ylab = "population size")
+  lines2(xs, y2)
+  
+  y1 <- mean_resistance(sim0)
+  y2 <- mean_resistance(sim1)
+  plotllog1(xs, y1, ylim = range(c(y1, y2)),
+            xlab = "time", ylab = "mean level of resistance")
+  lines2(xs, y2)
+  
+  y1 <- resistance_variance(sim0)
+  y2 <- resistance_variance(sim1)
+  plotllog1(xs, y1, ylim = range(c(y1, y2)),
+            xlab = "time", ylab = "variance of resistance")
+  lines2(xs, y2)
+  
+  par(opar)
+}
+```
+
 Comparing with and without mutation:
 
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
-x <- seq2(-.5, 1.5)
-time <- seq(1, 300, .1)
-size0 <- 2.5
-x0 <- 0
-sigma0 <- .05
-k0 <- 10
-k1 <- .1
-pm <- 10
-p0 <- 9.5
-p1 <- 4.75
-mu <- .95
-alpha <- 1
-eps <- .01
-
-sim0 <- simulator(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) |> 
+sim1 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
   log_transform()
-sim1 <- simulator(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
-  log_transform()
-
-opar <- par(mfrow = c(3, 1), plt = c(.15, .98, .24, .95), cex = 1)
-
-x <- sim0$time
-
-y1 <- sim0$pop_size
-y2 <- sim1$pop_size
-plotllog1(x, y1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "population size")
-lines2(x, y2)
-
-y1 <- mean_resistance(sim0)
-y2 <- mean_resistance(sim1)
-plotllog1(x, y1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "mean level of resistance")
-lines2(x, y2)
-
-y1 <- resistance_variance(sim0)
-y2 <- resistance_variance(sim1)
-plotllog1(x, y1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "variance of resistance")
-lines2(x, y2)
-
-par(opar)
+subplots(out2, sim1)
 ```
 
 
 ## Exploring the effect of initial variability in absence of mutation
 
 ```{r}
-x <- seq2(-.5, 1.5)
-time <- seq(1, 300, .1)
-size0 <- 2.5
-x0 <- 0
-sigma0 <- .05
-k0 <- 10
-k1 <- .1
-pm <- 10
-p0 <- 9.5
-p1 <- 4.75
-mu <- .95
-alpha <- 1
-eps <- .01
-
-sim0 <- simulator(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
+sim0 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
   log_transform()
-sim1 <- simulator(size0, x0, 0, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
+sim1 <- simulator(size0, x0, 0, pr, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
   log_transform()
 
-plotllog1(sim0$time, sim0$pop_size, ylim = c(0, 4), yaxs = "i",
-         xlab = "time", ylab = "population size")
-lines2(sim1$time, sim1$pop_size)
+y1 <- sim0$pop_size
+y2 <- sim1$pop_size
+plotllog1(sim0$time, y1, yaxs = "i", ylim = c(0, max(c(y1, y2))),
+          xlab = "time", ylab = "population size")
+lines2(sim1$time, y2)
 ```
 
 
 ## Bacterial dynamics in absence of drug
 
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
-x <- seq2(-.5, 1.5)
-time <- seq(1, 300, .1)
-size0 <- 2.5
-x0 <- 0
-sigma0 <- .05
-k0 <- 10
-k1 <- .1
-pm <- 10
-p0 <- 9.5
-p1 <- 4.75
-mu <- .95
-alpha <- 1
-eps <- .01
-
-sim0 <- simulator(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, eps, x, time) |> 
+sim1 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, 0, 0, alpha, mu, eps, x, time) |> 
   log_transform()
-sim1 <- simulator(size0, x0, sigma0, pm, p0, p1, 0, 0, alpha, mu, eps, x, time) |> 
-  log_transform()
-
-opar <- par(mfrow = c(3, 1), plt = c(.15, .98, .24, .95), cex = 1)
-
-x <- sim0$time
-
-y1 <- sim0$pop_size
-y2 <- sim1$pop_size
-plotllog1(x, y1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "population size")
-lines2(x, y2)
-
-y1 <- mean_resistance(sim0)
-y2 <- mean_resistance(sim1)
-plotllog1(x, y1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "mean level of resistance")
-lines2(x, y2)
-
-y1 <- resistance_variance(sim0)
-y2 <- resistance_variance(sim1)
-plotllog1(x, y1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "variance of resistance")
-lines2(x, y2)
-
-par(opar)
+subplots(out2, sim1)
 ```
+
 
 ## No drug, no mutation
 
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
-x <- seq2(-.5, 1.5)
-time <- seq(1, 300, .1)
-size0 <- 2.5
-x0 <- 0
-sigma0 <- .05
-k0 <- 10
-k1 <- .1
-pm <- 10
-p0 <- 9.5
-p1 <- 4.75
-mu <- .95
-alpha <- 1
-eps <- .01
-
-sim0 <- simulator(size0, x0, sigma0, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
+sim0 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
   log_transform()
-sim1 <- simulator(size0, x0, sigma0, pm, p0, p1, 0, 0, alpha, mu, 0, x, time) |> 
+sim1 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, 0, 0, alpha, mu, 0, x, time) |> 
   log_transform()
-
-opar <- par(mfrow = c(3, 1), plt = c(.15, .98, .24, .95), cex = 1)
-
-x <- sim0$time
-
-y1 <- sim0$pop_size
-y2 <- sim1$pop_size
-plotllog1(x, y1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "population size")
-lines2(x, y2)
-
-y1 <- mean_resistance(sim0)
-y2 <- mean_resistance(sim1)
-plotllog1(x, y1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "mean level of resistance")
-lines2(x, y2)
-
-y1 <- resistance_variance(sim0)
-y2 <- resistance_variance(sim1)
-plotllog1(x, y1, ylim = range(c(y1, y2)),
-         xlab = "time", ylab = "variance of resistance")
-lines2(x, y2)
-
-par(opar)
+subplots(sim0, sim1)
 ```
