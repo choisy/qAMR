@@ -348,10 +348,6 @@ plot_R0()
 A function that numerically integrates the integro-differential equation of the model:
 
 ```{r}
-convolution <- function(x, y) rowSums(x %*% t(y))
-```
-
-```{r}
 simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
                       alpha, mu, eps, x, time) {
   dt <- diff(time)
@@ -372,12 +368,12 @@ simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
     A <- 2 * eps^2
     B <- sqrt(pi * A)
     J <- as.matrix(as.data.frame(map(x, ~ exp(-(.x - x)^2 / A) / B)))
-    update_bact_pop <- function(bact_pop, pop_size) {
+    update_bact_pop <- function(bact_pop, pop_size, dt_val) {
       L <- colSums(J * (ps * bact_pop)) * dx / (1 + pop_size)^alpha
       (bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
     }
   } else {
-    update_bact_pop <- function(bact_pop, pop_size) {
+    update_bact_pop <- function(bact_pop, pop_size, dt_val) {
       L <- ps * bact_pop / (1 + pop_size)^alpha
       (bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
     }
@@ -386,7 +382,7 @@ simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
   bact_pop <- list(mr_bact_pop)
   mr_pop_size <- pop_size <- sum(mr_bact_pop)
   for (dt_val in dt) {
-    mr_bact_pop <- update_bact_pop(mr_bact_pop, mr_pop_size)
+    mr_bact_pop <- update_bact_pop(mr_bact_pop, mr_pop_size, dt_val)
     bact_pop <- c(bact_pop, list(mr_bact_pop))
     mr_pop_size <- sum(mr_bact_pop)
     pop_size <- c(pop_size, mr_pop_size)
