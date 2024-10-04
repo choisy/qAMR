@@ -20,8 +20,7 @@ Installing packages:
 needed_packages <- c("dplyr",
                      "magrittr",
                      "plot3D",
-                     "purrr",
-                     "rgl")
+                     "purrr")
 
 to_install <- needed_packages[! needed_packages %in% installed.packages()[,"Package"]]
 if (length(to_install)) install.packages(to_install)
@@ -382,9 +381,8 @@ simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
   bact_pop <- matrix(nrow = length(mr_bact_pop), ncol = length(dt) + 1)
   bact_pop[, 1] <- mr_bact_pop
   mr_pop_size <- pop_size <- sum(mr_bact_pop)
-  for (i in seq_along(dt)) {    
-    mr_bact_pop <- update_bact_pop(mr_bact_pop, mr_pop_size, dt[i])
-    bact_pop[, i + 1] <- mr_bact_pop
+  for (i in seq_along(dt)) {
+    bact_pop[, i + 1] <- mr_bact_pop <- update_bact_pop(mr_bact_pop, mr_pop_size, dt[i])
     mr_pop_size <- sum(mr_bact_pop)
     pop_size <- c(pop_size, mr_pop_size)
   }
