@@ -379,16 +379,17 @@ simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
     }
   }
 
-  bact_pop <- list(mr_bact_pop)
+  bact_pop <- matrix(nrow = length(mr_bact_pop), ncol = length(dt) + 1)
+  bact_pop[, 1] <- mr_bact_pop
   mr_pop_size <- pop_size <- sum(mr_bact_pop)
-  for (dt_val in dt) {
-    mr_bact_pop <- update_bact_pop(mr_bact_pop, mr_pop_size, dt_val)
-    bact_pop <- c(bact_pop, list(mr_bact_pop))
+  for (i in seq_along(dt)) {    
+    mr_bact_pop <- update_bact_pop(mr_bact_pop, mr_pop_size, dt[i])
+    bact_pop[, i + 1] <- mr_bact_pop
     mr_pop_size <- sum(mr_bact_pop)
     pop_size <- c(pop_size, mr_pop_size)
   }
   
-  bact_pop <- bact_popNA <- as.matrix(as.data.frame(bact_pop))
+  bact_popNA <- bact_pop
   bact_popNA[bact_popNA == 0] <- NA
   
   list(bact_pop = bact_pop, bact_popNA = bact_popNA, pop_size = pop_size,
@@ -502,7 +503,7 @@ mu <- .95
 alpha <- 1
 eps <- .01
 #eps <- .005
-system.time(out <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, eps, x, time))
+out <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, eps, x, time)
 ```
 
 Looking at the initial distribution and the mutation kernel:
