@@ -6,11 +6,9 @@ editor_options:
   chunk_output_type: console
 ---
 
-
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(fig.retina = 2, fig.align  = "center")
 ```
-
 
 ## Packages
 
@@ -32,7 +30,6 @@ Loading packages:
 library(dplyr)
 library(purrr)
 ```
-
 
 ## Parameters and functions
 
@@ -166,7 +163,6 @@ colI <- rgb2(255, 147, 1)
 colR <- rgb2(255, 63, 30)
 ```
 
-
 ## A bimodal distribution
 
 ```{r}
@@ -177,7 +173,6 @@ plot(x, y1, type = "n")
 polygon3(x, y1)
 polygon3(x, .25 * y2)
 ```
-
 
 ## A scale-free metric of resistance
 
@@ -193,12 +188,11 @@ x <- log(mic / C0) / log(C1 / C0)
 plotl(mic, x)
 ```
 
-
 ## The MMNP model
 
 $b(t,y)$ is the density of bacteria with resistance level $y$ at time $t$ and
-$B(t) = \int_\mathbb{R} b(t,y)dy$ is the total density of bacteria at time $t$. The
-evolutionary dynamics is described by the following equation:
+$B(t) = \int_\mathbb{R} b(t,y)dy$ is the total density of bacteria at time $t$.
+The evolutionary dynamics is described by the following equation:
 
 $$
 \frac{\partial b}{\partial t} = \frac{1}{(1 + B(t))^\alpha}\int_\mathbb{R} J(x-y)p(y)b(t,y)dy - (\mu(x) + k(x))b(t,x)
@@ -214,7 +208,7 @@ The corresponding R function reads:
 
 ```{r}
 k <- function(x, k0, k1) {
-  if (any(c(k0, k1) == 0)) return(0)
+  if (any(c(k0, k1) == 0)) return(rep(0, length(x)))
   k0 * (k1 / k0)^x
 }
 ```
@@ -271,8 +265,7 @@ The first derivative of R0:
 
 $$
 \frac{d\mathcal{R}_0}{dx} = \frac{k_0\log(1 + \theta)}{\left(\mu + \frac{k_0}{(1 + \theta)^x}\right)(1 + \theta)^x} - \frac{\left(\frac{p_m}{p_0} - 1\right)\log(\Delta)\Delta^x}{1 + \left(\frac{p_m}{p_0} - 1\right)\Delta^x}
-$$
-with 
+$$ with
 
 $$
 \theta = \frac{k_0 - k_1}{k_1} > 0
@@ -347,7 +340,7 @@ plot_R0()
 A function that numerically integrates the integro-differential equation of the model:
 
 ```{r}
-simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
+simulatorR <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
                       alpha, mu, eps, x, time) {
   dt <- diff(time)
   dx <- mean(diff(x))
@@ -368,7 +361,7 @@ simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
     B <- sqrt(pi * A)
     J <- as.matrix(as.data.frame(map(x, ~ exp(-(.x - x)^2 / A) / B)))
     update_bact_pop <- function(bact_pop, pop_size, dt_val) {
-      L <- colSums(J * (ps * bact_pop)) * dx / (1 + pop_size)^alpha
+      L <- colSums(J * ps * bact_pop) * dx / (1 + pop_size)^alpha
       (bact_pop + dt_val * L) / (1 + dt_val * (mu + ks))
     }
   } else {
@@ -378,13 +371,15 @@ simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
     }
   }
 
-  bact_pop <- matrix(nrow = length(mr_bact_pop), ncol = length(dt) + 1)
+  nb_t <- length(dt) + 1
+  bact_pop <- matrix(nrow = length(mr_bact_pop), ncol = nb_t)
   bact_pop[, 1] <- mr_bact_pop
-  mr_pop_size <- pop_size <- sum(mr_bact_pop)
-  for (i in seq_along(dt)) {
-    bact_pop[, i + 1] <- mr_bact_pop <- update_bact_pop(mr_bact_pop, mr_pop_size, dt[i])
-    mr_pop_size <- sum(mr_bact_pop)
-    pop_size <- c(pop_size, mr_pop_size)
+  pop_size <- vector("numeric", nb_t)
+  pop_size[1] <- mr_pop_size <- sum(mr_bact_pop)
+  for (i in 2:nb_t) {
+    bact_pop[, i] <- mr_bact_pop <- update_bact_pop(mr_bact_pop,
+                                                    mr_pop_size, dt[i - 1])
+    pop_size[i] <- mr_pop_size <- sum(mr_bact_pop)
   }
   
   bact_popNA <- bact_pop
@@ -405,6 +400,130 @@ simulator <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
                  mu     = mu,
                  eps    = eps))
 }
+```
+
+The for-loop rewritten in C++:
+
+```{Rcpp cache = TRUE}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+
+NumericMatrix Hadamard(NumericVector v, NumericMatrix m) {
+  unsigned int ncol = m.ncol();
+  unsigned int nrow = m.nrow();
+  NumericMatrix m2 (nrow, ncol);
+  for (unsigned int i = 0; i < ncol; i++) {
+    m2(_, i) = v * m(_, i);
+  }
+  return m2;
+}
+
+
+// [[Rcpp::export]]
+List evolving1(double dx, double alpha, double mu, NumericMatrix J,
+               NumericVector ps, NumericVector dt_val, NumericVector ks,
+               NumericVector mr_bact_pop_in) {
+  int nt = dt_val.size() + 1;
+  int nx = ps.size();
+  double mr_pop_size;
+  NumericMatrix bact_pop (nx, nt);
+  NumericVector pop_size (nt);
+  NumericVector mr_bact_pop (nx);
+  mr_bact_pop = clone(mr_bact_pop_in);
+  bact_pop(_, 0) = mr_bact_pop;
+  mr_pop_size = sum(mr_bact_pop);
+  pop_size(0) = mr_pop_size;
+  for(int i = 1; i < nt; i++) {
+    mr_bact_pop = (mr_bact_pop + dt_val(i - 1) *
+      (colSums(Hadamard(ps * mr_bact_pop, J)) *
+        dx / pow(1.0 + mr_pop_size, alpha))) / (1.0 + dt_val(i - 1) * (mu + ks));
+    bact_pop(_, i) = mr_bact_pop;
+    mr_pop_size = sum(mr_bact_pop);
+    pop_size(i) = mr_pop_size;
+  }
+  return List::create(bact_pop, pop_size);
+}
+
+
+// [[Rcpp::export]]
+List evolving2(double dx, double alpha, double mu,
+               NumericVector ps, NumericVector dt_val, NumericVector ks,
+               NumericVector mr_bact_pop_in) {
+  int nt = dt_val.size() + 1;
+  int nx = ps.size();
+  double mr_pop_size;
+  NumericMatrix bact_pop (nx, nt);
+  NumericVector pop_size (nt);
+  NumericVector mr_bact_pop (nx);
+  mr_bact_pop = clone(mr_bact_pop_in);
+  bact_pop(_, 0) = mr_bact_pop;
+  mr_pop_size = sum(mr_bact_pop);
+  pop_size(0) = mr_pop_size;
+  for(int i = 1; i < nt; i++) {
+    mr_bact_pop = (mr_bact_pop + dt_val(i - 1) *
+      (ps * mr_bact_pop / pow(1.0 + mr_pop_size, alpha))) /
+        (1.0 + dt_val(i - 1) * (mu + ks));
+    bact_pop(_, i) = mr_bact_pop;
+    mr_pop_size = sum(mr_bact_pop);
+    pop_size(i) = mr_pop_size;
+  }
+  return List::create(bact_pop, pop_size);
+}
+```
+
+The simulator using the for-loop written in C++:
+
+```{r}
+simulatorCpp <- function(size0, x0, sigma0, pr, pm, p0, p1, k0, k1,
+                         alpha, mu, eps, x, time) {
+  dt <- diff(time)
+  dx <- mean(diff(x))
+  ps <- p(x, pm, p0, p1)
+  ks <- k(x, k0, k1)
+  
+  if (sigma0 > 0) {
+    mr_bact_pop <- size0 * dnorm2(x, x0, sigma0, pr)
+  } else {
+    x1 <- rev(seq(x0, min(x), - dx))
+    x2 <- seq(x0 + dx, max(x) + dx, dx)
+    x <- c(x1, x2)
+    mr_bact_pop <- c(rep(0, length(x1) - 1), size0, rep(0, length(x2)))
+  }
+    
+  if (eps > 0) {
+    A <- 2 * eps^2
+    B <- sqrt(pi * A)
+    J <- as.matrix(as.data.frame(map(x, ~ exp(-(.x - x)^2 / A) / B)))
+    out <- evolving1(dx, alpha, mu, J, ps, dt, ks, mr_bact_pop)
+  } else {
+    out <- evolving2(dx, alpha, mu, ps, dt, ks, mr_bact_pop)
+  }
+  
+  bact_popNA <- bact_pop <- out[[1]]
+  bact_popNA[bact_popNA == 0] <- NA
+  
+  list(bact_pop = bact_pop, bact_popNA = bact_popNA, pop_size = out[[2]],
+       x = x, time = time,
+       param = c(size0  = size0,
+                 x0     = x0,
+                 sigma0 = sigma0,
+                 pr     = pr,
+                 pm     = pm,
+                 p0     = p0,
+                 p1     = p1,
+                 k0     = k0,
+                 k1     = k1,
+                 alpha  = alpha,
+                 mu     = mu,
+                 eps    = eps))
+}
+```
+
+Let's specify that we want to use the C++-based simulator for what follows:
+
+```{r}
+simulator <- simulatorCpp
 ```
 
 The mean level of resistance:
@@ -554,8 +673,7 @@ with(out3D, plot3D::persp3D(time, x, bact_pop, theta = -45, phi = 15, r = 10 * s
                                           shift  = .13)))
 ```
 
-Plotting the bacterial population size, the mean resistance, and the variance of
-resistance as a function of time:
+Plotting the bacterial population size, the mean resistance, and the variance of resistance as a function of time:
 
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
 opar <- par(mfrow = c(3, 1), plt = c(.15, .98, .24, .95), cex = 1)
@@ -567,7 +685,6 @@ plotllog1(out2$time, resistance_variance(out2),
          xlab = "time", ylab = "variance of resistance")
 par(opar)
 ```
-
 
 ## Treatment outpout
 
@@ -585,8 +702,7 @@ cb <- function(p, k, mu) {
 }
 ```
 
-The efficacy of the drug relative to the natural death rate of the bacteria (including
-everything (immune system, etc...) but the drug):
+The efficacy of the drug relative to the natural death rate of the bacteria (including everything (immune system, etc...) but the drug):
 
 $$
 \frac{k(x)}{\mu(x)}
@@ -668,7 +784,6 @@ An example of figure 4:
 figure4(pm, p0 = 7, p1, k0, k1, mu, xlim = c(0, 4), ylim = c(0, 3))
 ```
 
-
 ## Exploring the effect of mutation
 
 ```{r}
@@ -707,7 +822,6 @@ sim1 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, 0, x, ti
 subplots(out2, sim1)
 ```
 
-
 ## Exploring the effect of initial variability in absence of mutation
 
 ```{r}
@@ -723,8 +837,9 @@ plotllog1(sim0$time, y1, yaxs = "i", ylim = c(0, max(c(y1, y2))),
 lines2(sim1$time, y2)
 ```
 
-
 ## Bacterial dynamics in absence of drug
+
+Does not work:::
 
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
 sim1 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, 0, 0, alpha, mu, eps, x, time) |> 
@@ -732,8 +847,9 @@ sim1 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, 0, 0, alpha, mu, eps, x, ti
 subplots(out2, sim1)
 ```
 
-
 ## No drug, no mutation
+
+Does not work:::
 
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
 sim0 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
