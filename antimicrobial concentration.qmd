@@ -1,0 +1,67 @@
+---
+title: "Antimicrobial concentration"
+format: html
+editor: visual
+---
+
+## Bacterial growth
+
+Density-dependence can be on growth and/or death:
+
+$$
+\frac{dN}{dt} = f(N) b N - g(N) \mu N
+$$
+
+A specific example:
+
+$$
+\frac{dN}{dt} = \frac{1}{(1 + N)^\alpha}bN - (1 + N)^\beta\mu N
+$$
+
+
+## Antimicrobial effect
+
+Similarly, antimicrobial effect can be on growth and/or death:
+
+$$
+\frac{dN}{dt} = f(N) b s(c) N - (g(N) \mu + k(c)) N
+$$
+
+Specific examples of $s(c)$ and $k(c)$ based on Michaelis-Menten. First the killing
+rate following a Michaelis-Menten
+
+$$
+k(c) = \frac{c}{C_k + c}K
+$$
+
+where K is the maximum killing rate and $C_k$ is the antimicrobial concentration at
+which half of this maximum is reached.
+
+```{r}
+k <- function(c, K, Ck) {
+  K * c / (Ck + c)
+}
+```
+
+For the reduction of birth:
+
+$$
+s(c) = 1 - \frac{c}{C_s + S\cdot c}S
+$$
+
+```{r}
+s <- function(c, S, Cs) {
+  1 - c * S / (Cs + S * c)
+}
+```
+
+
+## Minimum inhibitory concentration
+
+$$
+bs(\mbox{mic}) = \mu + k(\mbox{mic})
+$$
+
+$$
+\mbox{mic} = \frac{b + \sqrt{[(b - \mu K)^2H_s + 4\mu KbH_k]H_s}}{2\mu K} - \frac{1}{2}
+$$
