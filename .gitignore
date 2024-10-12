@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 qAMR_cache/*
+*.DS_Store
