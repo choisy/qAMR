@@ -2,6 +2,8 @@
 title: "Antimicrobial concentration"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Bacterial growth
@@ -17,6 +19,47 @@ A specific example:
 $$
 \frac{dN}{dt} = \frac{1}{(1 + N)^\alpha}bN - (1 + N)^\beta\mu N
 $$
+```{r}
+seq2 <- function(...) seq(..., le = 512)
+
+plotl <- function(..., lwd = 8, col = 4) plot(..., type = "l", lwd = lwd, col = col)
+
+lines2 <- function(..., lwd = 8, col = 2) lines(..., lwd = lwd, col = col)
+```
+
+
+```{r}
+f <- function(x, alpha) {
+  1 / (1 + x)^alpha
+}
+
+xs <- seq2(0, 10)
+plotl(xs, f(xs, 1))
+```
+
+```{r}
+g <- function(x, alpha) {
+  (1 + x)^alpha
+}
+
+xs <- seq2(0, 1000)
+plotl(xs, g(xs, .1))
+```
+
+
+```{r}
+hill <- function(x, X, Y, h) {
+  x2h <- x^h
+  Y * x2h / (X^h + x2h)
+}
+```
+
+```{r}
+xs <- seq2(0, 10)
+plotl(xs, hill(xs, 3, 2, 4))
+lines2(xs, xs^.3)
+abline(0, .2, col = 3, lwd = 8)
+```
 
 
 ## Antimicrobial effect
@@ -27,15 +70,13 @@ $$
 \frac{dN}{dt} = f(N) b s(c) N - (g(N) \mu + k(c)) N
 $$
 
-Specific examples of $s(c)$ and $k(c)$ based on Michaelis-Menten. First the killing
-rate following a Michaelis-Menten
+Specific examples of $s(c)$ and $k(c)$ based on Michaelis-Menten. First the killing rate following a Michaelis-Menten
 
 $$
-k(c) = \frac{c}{C_k + c}K
+k(D) = \frac{KD}{C_k + D} \simeq \frac{KD}{2C_k}
 $$
 
-where K is the maximum killing rate and $C_k$ is the antimicrobial concentration at
-which half of this maximum is reached.
+where K is the maximum killing rate and $C_k$ is the antimicrobial concentration at which half of this maximum is reached.
 
 ```{r}
 k <- function(c, K, Ck) {
@@ -46,7 +87,7 @@ k <- function(c, K, Ck) {
 For the reduction of birth:
 
 $$
-s(c) = 1 - \frac{c}{C_s + S\cdot c}S
+s(D) = \frac{C_s}{C_s + D} \simeq 1 - \frac{D}{2C_s}
 $$
 
 ```{r}
@@ -55,13 +96,24 @@ s <- function(c, S, Cs) {
 }
 ```
 
-
 ## Minimum inhibitory concentration
 
 $$
-bs(\mbox{mic}) = \mu + k(\mbox{mic})
+bs(\mbox{MIC}) = \mu + k(\mbox{MIC})
 $$
 
 $$
-\mbox{mic} = \frac{b + \sqrt{[(b - \mu K)^2H_s + 4\mu KbH_k]H_s}}{2\mu K} - \frac{1}{2}
+\mbox{MIC} \simeq \frac{\lambda - \mu}{\frac{K}{2C_k} + \frac{\lambda}{2C_s}}
+$$
+
+$$
+\mbox{MIC}_s = \frac{\lambda - \mu}{\mu}C_s \simeq 2\frac{\lambda - \mu}{\lambda}C_s \propto (\lambda - \mu) C_s
+$$
+
+$$
+\mbox{MIC}_k = \frac{\lambda - \mu}{K - (\lambda - \mu)}C_k \simeq 2(\lambda - \mu)\frac{C_k}{K} \propto \frac{C_k}{K}\log(\mbox{R}_0)
+$$
+
+$$
+\mbox{MIC} \propto \frac{\log(\mbox{R}_0)}{\mathcal{E}}
 $$

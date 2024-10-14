@@ -135,6 +135,62 @@ window.Quarto = {
 <p><span class="math display">\[
 \frac{dN}{dt} = \frac{1}{(1 + N)^\alpha}bN - (1 + N)^\beta\mu N
 \]</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>seq2 <span class="ot">&lt;-</span> <span class="cf">function</span>(...) <span class="fu">seq</span>(..., <span class="at">le =</span> <span class="dv">512</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>plotl <span class="ot">&lt;-</span> <span class="cf">function</span>(..., <span class="at">lwd =</span> <span class="dv">8</span>, <span class="at">col =</span> <span class="dv">4</span>) <span class="fu">plot</span>(..., <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> lwd, <span class="at">col =</span> col)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>lines2 <span class="ot">&lt;-</span> <span class="cf">function</span>(..., <span class="at">lwd =</span> <span class="dv">8</span>, <span class="at">col =</span> <span class="dv">2</span>) <span class="fu">lines</span>(..., <span class="at">lwd =</span> lwd, <span class="at">col =</span> col)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x, alpha) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> x)<span class="sc">^</span>alpha</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>xs <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(xs, <span class="fu">f</span>(xs, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="antimicrobial-concentration_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="cf">function</span>(x, alpha) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  (<span class="dv">1</span> <span class="sc">+</span> x)<span class="sc">^</span>alpha</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>xs <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">1000</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(xs, <span class="fu">g</span>(xs, .<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="antimicrobial-concentration_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hill <span class="ot">&lt;-</span> <span class="cf">function</span>(x, X, Y, h) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  x2h <span class="ot">&lt;-</span> x<span class="sc">^</span>h</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  Y <span class="sc">*</span> x2h <span class="sc">/</span> (X<span class="sc">^</span>h <span class="sc">+</span> x2h)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>xs <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(xs, <span class="fu">hill</span>(xs, <span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">4</span>))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines2</span>(xs, xs<span class="sc">^</span>.<span class="dv">3</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, .<span class="dv">2</span>, <span class="at">col =</span> <span class="dv">3</span>, <span class="at">lwd =</span> <span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="antimicrobial-concentration_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="antimicrobial-effect" class="level2">
 <h2 class="anchored" data-anchor-id="antimicrobial-effect">Antimicrobial effect</h2>
@@ -144,31 +200,37 @@ window.Quarto = {
 \]</span></p>
 <p>Specific examples of <span class="math inline">\(s(c)\)</span> and <span class="math inline">\(k(c)\)</span> based on Michaelis-Menten. First the killing rate following a Michaelis-Menten</p>
 <p><span class="math display">\[
-k(c) = \frac{c}{C_k + c}K
+k(D) = \frac{KD}{C_k + D} \simeq \frac{KD}{2C_k}
 \]</span></p>
 <p>where K is the maximum killing rate and <span class="math inline">\(C_k\)</span> is the antimicrobial concentration at which half of this maximum is reached.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="cf">function</span>(c, K, Ck) {</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  K <span class="sc">*</span> c <span class="sc">/</span> (Ck <span class="sc">+</span> c)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>k <span class="ot">&lt;-</span> <span class="cf">function</span>(c, K, Ck) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  K <span class="sc">*</span> c <span class="sc">/</span> (Ck <span class="sc">+</span> c)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>For the reduction of birth:</p>
 <p><span class="math display">\[
-s(c) = 1 - \frac{c}{C_s + S\cdot c}S
+s(D) = \frac{C_s}{C_s + D} \simeq 1 - \frac{D}{2C_s}
 \]</span></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="cf">function</span>(c, S, Cs) {</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">-</span> c <span class="sc">*</span> S <span class="sc">/</span> (Cs <span class="sc">+</span> S <span class="sc">*</span> c)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="cf">function</span>(c, S, Cs) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">-</span> c <span class="sc">*</span> S <span class="sc">/</span> (Cs <span class="sc">+</span> S <span class="sc">*</span> c)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="minimum-inhibitory-concentration" class="level2">
 <h2 class="anchored" data-anchor-id="minimum-inhibitory-concentration">Minimum inhibitory concentration</h2>
 <p><span class="math display">\[
-bs(\mbox{mic}) = \mu + k(\mbox{mic})
+bs(\mbox{MIC}) = \mu + k(\mbox{MIC})
 \]</span></p>
 <p><span class="math display">\[
-\mbox{mic} = \frac{b + \sqrt{[(b - \mu K)^2H_s + 4\mu KbH_k]H_s}}{2\mu K} - \frac{1}{2}
+\mbox{MIC} \simeq \frac{\lambda - \mu}{\frac{K}{2C_k} - \frac{\lambda}{2C_s}}
+\]</span></p>
+<p><span class="math display">\[
+\mbox{MIC}_s = \frac{\lambda - \mu}{\mu}C_s \simeq 2\frac{\mu - \lambda}{\lambda}C_s \propto (\lambda - \mu) C_s
+\]</span></p>
+<p><span class="math display">\[
+\mbox{MIC}_k = \frac{\lambda - \mu}{K - (\lambda - \mu)}C_k \simeq 2(\lambda - \mu)\frac{C_k}{K} \propto (\lambda - \mu)\frac{C_k}{K}
 \]</span></p>
 </section>
 
