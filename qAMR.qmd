@@ -204,19 +204,6 @@ polygon3(x[!sel2], .25 * y2[!sel2], colR, 1)
 ```
 
 
-```{r}
-plot(x, y1, type = "n")
-polygon3(x, y1, colS, 1)
-polygon3(x, .25 * y2, colS, 1)
-```
-
-```{r}
-plot(x, y1, type = "n")
-polygon3(x, y1, colR, 1)
-polygon3(x, .25 * y2, colR, 1)
-```
-
-
 ## A scale-free metric of resistance
 
 $$
@@ -239,6 +226,22 @@ $$
 \frac{\partial b}{\partial t} = \frac{1}{(1 + B(t))^\alpha}\int_\mathbb{R} J(x-y)p(y)b(t,y)dy - (\mu(x) + k(x))b(t,x)
 $$
 
+The density-dependence looks like this:
+
+```{r}
+x <- seq2(0, 100)
+plot(NA, xlim = range(x), ylim = 0:1)
+c(.1, .5, 1, 2) |> 
+  map(~ 1 / (1 + x)^.x) |> 
+  walk(~ lines2(x, .x, lwd = 8, col = 4))
+```
+
+```{r}
+x <- seq2(0, 10)
+plotl(x, 1 / (1 + x), ylim = 0:1, lwd = 8)
+```
+
+
 The antimicrobial activity as a function of bacterial resistance can be expressed as:
 
 $$
@@ -259,6 +262,10 @@ An illustration:
 ```{r}
 x <- seq2(-2, 4)
 plotl(x, k(x, 5, 3))
+rect2(-3, 0, 0, 15, col = colS)
+rect2(0, 0, 1, 15, col = colI)
+rect2(1, 0, 5, 15, col = colR)
+lines(x, k(x, 5, 3), lwd = 8, col = 4)
 ```
 
 The maximum bacterial growth rate as a function of bacterial resistance:
@@ -280,6 +287,10 @@ An illustration:
 ```{r}
 x <- seq2(-9, 10)
 plotl(x, p(x, 10, 5, 3))
+rect2(-10, -1, 0, 11, col = colS)
+rect2(0, -1, 1, 11, col = colI)
+rect2(1, -1, 11, 11, col = colR)
+lines2(x, p(x, 10, 5, 3), lwd = 8, col = 4)
 ```
 
 The basic reproduction ratio:
@@ -352,9 +363,10 @@ plot_R0 <- function(k0 = 10, k1 = .1, pm = 10, p0 = 9.5, p1 = 4.75, mu = .95,
   plot(x, R0_nodrug, ylim = c(0, ymax), type = "n", axes = FALSE, yaxs = "i",
        xlab = "level of resistance", ylab = "R0")
   
-  rect2(xmin, -1, 0, ymax, col = colS)
-  rect2(0, -1, 1, ymax, col = colI)
-  rect2(1, -1, xmax, ymax, col = colR)
+  rect2(xmin, 1, 0, ymax, col = colS)
+  rect2(0, 1, 1, ymax, col = colI)
+  rect2(1, 1, xmax, ymax, col = colR)
+  rect2(xmin, -1, xmax, 1, col = "lightgrey")
   
   abline(h = 1, lwd = 4, lty = 3)
   
@@ -375,6 +387,10 @@ Plot of R0:
 
 ```{r}
 plot_R0()
+```
+
+```{r}
+
 ```
 
 A function that numerically integrates the integro-differential equation of the model:

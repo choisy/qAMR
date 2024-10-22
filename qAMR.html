@@ -312,30 +312,6 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, y1, <span class="at">type =</span> <span class="st">"n"</span>)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3</span>(x, y1, colS, <span class="dv">1</span>)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3</span>(x, .<span class="dv">25</span> <span class="sc">*</span> y2, colS, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x, y1, <span class="at">type =</span> <span class="st">"n"</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3</span>(x, y1, colR, <span class="dv">1</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">polygon3</span>(x, .<span class="dv">25</span> <span class="sc">*</span> y2, colR, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
 </section>
 <section id="a-scale-free-metric-of-resistance" class="level2">
 <h2 class="anchored" data-anchor-id="a-scale-free-metric-of-resistance">A scale-free metric of resistance</h2>
@@ -343,15 +319,15 @@ window.Quarto = {
 x = \frac{\log\left(\frac{\rm MIC}{\rm C_0}\right)}{\log\left(\frac{\rm C_1}{\rm C_0}\right)}
 \]</span></p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>C0 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> <span class="dv">3</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>mic <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">log</span>(mic <span class="sc">/</span> C0) <span class="sc">/</span> <span class="fu">log</span>(C1 <span class="sc">/</span> C0)</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(mic, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>C0 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>mic <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">log</span>(mic <span class="sc">/</span> C0) <span class="sc">/</span> <span class="fu">log</span>(C1 <span class="sc">/</span> C0)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(mic, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="qAMR_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+<p><img src="qAMR_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -363,6 +339,32 @@ x = \frac{\log\left(\frac{\rm MIC}{\rm C_0}\right)}{\log\left(\frac{\rm C_1}{\rm
 <p><span class="math display">\[
 \frac{\partial b}{\partial t} = \frac{1}{(1 + B(t))^\alpha}\int_\mathbb{R} J(x-y)p(y)b(t,y)dy - (\mu(x) + k(x))b(t,x)
 \]</span></p>
+<p>The density-dependence looks like this:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">100</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">range</span>(x), <span class="at">ylim =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(.<span class="dv">1</span>, .<span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(<span class="sc">~</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> x)<span class="sc">^</span>.x) <span class="sc">|&gt;</span> </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">walk</span>(<span class="sc">~</span> <span class="fu">lines2</span>(x, .x, <span class="at">lwd =</span> <span class="dv">8</span>, <span class="at">col =</span> <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="qAMR_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(x, <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> x), <span class="at">ylim =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="qAMR_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 <p>The antimicrobial activity as a function of bacterial resistance can be expressed as:</p>
 <p><span class="math display">\[
 k(x) = k_0\left(\frac{k_1}{k_0}\right)^x
@@ -377,7 +379,11 @@ k(x) = k_0\left(\frac{k_1}{k_0}\right)^x
 <p>An illustration:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">4</span>)</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(x, <span class="fu">k</span>(x, <span class="dv">5</span>, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(x, <span class="fu">k</span>(x, <span class="dv">5</span>, <span class="dv">3</span>))</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">15</span>, <span class="at">col =</span> colS)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">15</span>, <span class="at">col =</span> colI)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">15</span>, <span class="at">col =</span> colR)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, <span class="fu">k</span>(x, <span class="dv">5</span>, <span class="dv">3</span>), <span class="at">lwd =</span> <span class="dv">8</span>, <span class="at">col =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -399,7 +405,11 @@ p(x) = \frac{p_m}{1 + \frac{p_m - p_0}{p_0}\left(\frac{p_0}{p_1}\frac{p_m - p_1}
 <p>An illustration:</p>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq2</span>(<span class="sc">-</span><span class="dv">9</span>, <span class="dv">10</span>)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(x, <span class="fu">p</span>(x, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotl</span>(x, <span class="fu">p</span>(x, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">3</span>))</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">11</span>, <span class="at">col =</span> colS)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">11</span>, <span class="at">col =</span> colI)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rect2</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">11</span>, <span class="dv">11</span>, <span class="at">col =</span> colR)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">lines2</span>(x, <span class="fu">p</span>(x, <span class="dv">10</span>, <span class="dv">5</span>, <span class="dv">3</span>), <span class="at">lwd =</span> <span class="dv">8</span>, <span class="at">col =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -463,23 +473,24 @@ f_x(y) = \frac{\mathcal{R}_0(y) - \mathcal{R}_0(x)}{\mathcal{R}_0(x)}
 <span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(x, R0_nodrug, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, ymax), <span class="at">type =</span> <span class="st">"n"</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>,</span>
 <span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"level of resistance"</span>, <span class="at">ylab =</span> <span class="st">"R0"</span>)</span>
 <span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect2</span>(xmin, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, ymax, <span class="at">col =</span> colS)</span>
-<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect2</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, ymax, <span class="at">col =</span> colI)</span>
-<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect2</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, xmax, ymax, <span class="at">col =</span> colR)</span>
-<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">4</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
-<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines2</span>(x, R0_drug)</span>
-<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines2</span>(x, R0_nodrug, <span class="at">col =</span> <span class="dv">4</span>)</span>
-<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(xStar, <span class="sc">-</span><span class="dv">1</span>, xStar, R0max, <span class="at">col =</span> <span class="dv">2</span>)</span>
-<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(<span class="sc">-</span><span class="dv">1</span>, R0max, xStar, R0max, <span class="at">col =</span> <span class="dv">2</span>)</span>
-<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(xStar, R0max, <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="dv">2</span>)</span>
-<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(<span class="fu">min</span>(x), <span class="fu">max</span>(R0_nodrug), <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="dv">4</span>)</span>
-<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>); <span class="fu">axis</span>(<span class="dv">2</span>)</span>
-<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect2</span>(xmin, <span class="dv">1</span>, <span class="dv">0</span>, ymax, <span class="at">col =</span> colS)</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect2</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, ymax, <span class="at">col =</span> colI)</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect2</span>(<span class="dv">1</span>, <span class="dv">1</span>, xmax, ymax, <span class="at">col =</span> colR)</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect2</span>(xmin, <span class="sc">-</span><span class="dv">1</span>, xmax, <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"lightgrey"</span>)</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">4</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines2</span>(x, R0_drug)</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines2</span>(x, R0_nodrug, <span class="at">col =</span> <span class="dv">4</span>)</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(xStar, <span class="sc">-</span><span class="dv">1</span>, xStar, R0max, <span class="at">col =</span> <span class="dv">2</span>)</span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(<span class="sc">-</span><span class="dv">1</span>, R0max, xStar, R0max, <span class="at">col =</span> <span class="dv">2</span>)</span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(xStar, R0max, <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="dv">2</span>)</span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>(<span class="fu">min</span>(x), <span class="fu">max</span>(R0_nodrug), <span class="at">cex =</span> <span class="fl">1.5</span>, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="dv">4</span>)</span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>); <span class="fu">axis</span>(<span class="dv">2</span>)</span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Plot of R0:</p>
 <div class="cell" data-layout-align="center">
