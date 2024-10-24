@@ -1,0 +1,20 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+$p$ is the probability of treatment success as a function of $\mbox{MIC}$:
+
+$$
+p = e^{-\rho \cdot \mbox{MIC}}
+$$
+
+Transforming $p$ into an unbounded quantity:
+
+$$
+x = \log\left(\frac{p}{1 - p}\right)
+$$
+

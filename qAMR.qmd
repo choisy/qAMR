@@ -165,13 +165,37 @@ colR <- rgb2(255, 63, 30)
 
 ## A bimodal distribution
 
+
+```{r}
+p <- function(x, pm, p0, p1) {
+  pm / (1 + ((pm - p0) / p0) * (p0 * (pm - p1) / (p1 * (pm - p0)))^x)
+}
+x <- seq2(0, 10)
+y1 <- dnorm(x, 2.5, .8)
+plot(x, y1, type = "n")
+th1 <- 3
+th2 <- 6.5
+abline(v = th1)
+abline(v = th2)
+lines2(x, p(x - 5, .45, .25, .1), col = 4)
+```
+
+```{r}
+x <- seq2(0, 10)
+y1 <- dnorm(x, 2.5, .8)
+y2 <- dnorm(x, 7, .5)
+plot(x, y1, type = "n")
+polygon3(x, y1, col = "#4F9000", alpha = 1)
+polygon3(x, .25 * y2)
+```
+
 ```{r}
 x <- seq2(0, 10)
 y1 <- dnorm(x, 2.5, .8)
 y2 <- dnorm(x, 7, .5)
 plot(x, y1, type = "n")
 polygon3(x, y1)
-polygon3(x, .25 * y2)
+polygon3(x, .25 * y2, colR, 1)
 ```
 
 ```{r}
@@ -416,8 +440,6 @@ plot_R0()
 ```
 
 ```{r}
-#drug <- c(0:9 / 10000, 1:9 / 1000, 1:9 / 100, 1:9 / 10, 10^seq(0, 4, .1))
-#drug <- seq(1e-6, 1e4)
 drug <- 10^seq(-6, 4, le = 3 * 512)
 x <- seq2(-1, 2)
 fitness <- map(drug,
@@ -425,12 +447,6 @@ fitness <- map(drug,
                     mu = .95))
 xs <- x[map_int(fitness, which.max)]
 ys <- map_dbl(fitness, max)
-
-#plot(NA, xlim = range(x), ylim = c(0, 11))
-#walk(fitness, ~ lines2(x, .x))
-#abline(h = 1)
-#abline(v = 0:1)
-#lines(xs, ys)
 ```
 
 ```{r}
