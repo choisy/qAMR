@@ -177,7 +177,9 @@ th1 <- 3
 th2 <- 6.5
 abline(v = th1)
 abline(v = th2)
+abline(h = .432)
 lines2(x, p(x - 5, .45, .25, .1), col = 4)
+lines2(x, p(x - 8.5, .45, .25, .1))
 ```
 
 ```{r}
