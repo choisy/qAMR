@@ -267,6 +267,17 @@ x <- seq2(0, 10)
 plotl(x, 1 / (1 + x), ylim = 0:1, lwd = 8)
 ```
 
+```{r}
+x <- seq2(-5, 5)
+plotl(x, dnorm(x, 0, 1), lwd = 8)
+```
+
+```{r}
+x <- seq2(-5, 5)
+plot(x, dnorm(x, 0, 1), type = "n")
+polygon3(x, dnorm(x, 0, 1))
+```
+
 
 The antimicrobial activity as a function of bacterial resistance can be expressed as:
 
@@ -910,7 +921,7 @@ figure4(pm, p0 = 7, p1, k0, k1, mu, xlim = c(0, 4), ylim = c(0, 3))
 ## Exploring the effect of mutation
 
 ```{r}
-subplots <- function(sim0, sim1) {
+subplots <- function(sim0, sim1, plot2 = TRUE) {
   opar <- par(mfrow = c(3, 1), plt = c(.15, .98, .24, .95), cex = 1)
 
   xs <- sim0$time
@@ -919,19 +930,19 @@ subplots <- function(sim0, sim1) {
   y2 <- sim1$pop_size
   plotllog1(xs, y1, ylim = range(c(y1, y2)),
             xlab = "time", ylab = "population size")
-  lines2(xs, y2)
+  if (plot2) lines2(xs, y2)
   
   y1 <- mean_resistance(sim0)
   y2 <- mean_resistance(sim1)
   plotllog1(xs, y1, ylim = range(c(y1, y2)),
             xlab = "time", ylab = "mean level of resistance")
-  lines2(xs, y2)
+  if (plot2) lines2(xs, y2)
   
   y1 <- resistance_variance(sim0)
   y2 <- resistance_variance(sim1)
   plotllog1(xs, y1, ylim = range(c(y1, y2)),
             xlab = "time", ylab = "variance of resistance")
-  lines2(xs, y2)
+  if (plot2) lines2(xs, y2)
   
   par(opar)
 }
@@ -942,8 +953,15 @@ Comparing with and without mutation:
 ```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
 sim1 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
   log_transform()
+subplots(out2, sim1, FALSE)
+```
+
+```{r fig.height = 3 * 5 / 2, fig.width = 7 / 2}
+sim1 <- simulator(size0, x0, sigma0, pr, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |> 
+  log_transform()
 subplots(out2, sim1)
 ```
+
 
 ## Exploring the effect of initial variability in absence of mutation
 
@@ -955,9 +973,9 @@ sim1 <- simulator(size0, x0, 0, pr, pm, p0, p1, k0, k1, alpha, mu, 0, x, time) |
 
 y1 <- sim0$pop_size
 y2 <- sim1$pop_size
-plotllog1(sim0$time, y1, yaxs = "i", ylim = c(0, max(c(y1, y2))),
+plotllog1(sim0$time, y1, yaxs = "i", ylim = c(0, max(c(y1, y2))), col = 2,
           xlab = "time", ylab = "population size")
-lines2(sim1$time, y2)
+lines2(sim1$time, y2, col = 3)
 ```
 
 ## Bacterial dynamics in absence of drug
