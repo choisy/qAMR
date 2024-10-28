@@ -173,14 +173,42 @@ p <- function(x, pm, p0, p1) {
 x <- seq2(0, 10)
 y1 <- dnorm(x, 2.5, .8)
 plot(x, y1, type = "n")
+lines2(x, p(x - 5, .45, .25, .1), col = 4)
+```
+
+```{r}
+plot(x, y1, type = "n")
 th1 <- 3
+abline(v = th1)
+abline(h = .432)
+rect2(-1, -1, th1, 1, col = colS)
+lines2(x, p(x - 5, .45, .25, .1), col = 4)
+```
+
+```{r}
+plot(x, y1, type = "n")
 th2 <- 6.5
 abline(v = th1)
 abline(v = th2)
 abline(h = .432)
+rect2(-1, -1, th1, 1, col = colS)
+rect2(th2, -1, 11, 1, col = colR)
 lines2(x, p(x - 5, .45, .25, .1), col = 4)
 lines2(x, p(x - 8.5, .45, .25, .1))
 ```
+
+```{r}
+plot(x, y1, type = "n")
+abline(v = th1)
+abline(v = th2)
+abline(h = .432)
+rect2(-1, -1, th1, 1, col = colS)
+rect2(th1, -1, th2, 11, col = colI)
+rect2(th2, -1, 11, 1, col = colR)
+lines2(x, p(x - 5, .45, .25, .1), col = 4)
+lines2(x, p(x - 8.5, .45, .25, .1))
+```
+
 
 ```{r}
 x <- seq2(0, 10)
