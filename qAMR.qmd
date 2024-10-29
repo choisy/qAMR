@@ -474,7 +474,46 @@ plot_R0b <- function(k0 = 10, k1 = .1, pm = 10, p0 = 9.5, p1 = 4.75, mu = .95,
 }
 ```
 
+```{r}
+plot_R0c <- function(k0 = 10, k1 = .1, pm = 10, p0 = 9.5, p1 = 4.75, mu = .95,
+                    x = seq2(-1, 2)) {
+  R0_drug <- R0(x, k0, k1, pm, p0, p1, mu)
+  R0_nodrug <- R0(x, 0, 0, pm, p0, p1, mu)
+  xStar <- R_evol_level(k0, k1, p1, p0, pm, mu)
+  R0max <- max(R0_drug)
+  
+  xmin <- min(x)
+  xmax <- max(x)
+  ymax <- 1.04 * max(R0_nodrug)
+  
+  plot(x, R0_nodrug, ylim = c(0, ymax), type = "n", axes = FALSE, yaxs = "i",
+       xlab = "level of resistance", ylab = "R0")
+  
+  rect2(xmin, 1, 0, ymax, col = colS)
+  rect2(0, 1, 1, ymax, col = colI)
+  rect2(1, 1, xmax, ymax, col = colR)
+  rect2(xmin, -1, xmax, 1, col = "lightgrey")
+  
+  abline(h = 1, lwd = 4, lty = 3)
+  
+#  lines2(x, R0_drug)
+  lines2(x, R0_nodrug, col = 4)
+  
+#  segments(xStar, -1, xStar, R0max, col = 2)
+#  segments(-1, R0max, xStar, R0max, col = 2)
+  
+#  points(xStar, R0max, cex = 1.5, pch = 19, col = 2)
+  points(min(x), max(R0_nodrug), cex = 1.5, pch = 19, col = 4)
+  
+  axis(1); axis(2)
+}
+```
+
 Plot of R0:
+
+```{r}
+plot_R0c()
+```
 
 ```{r}
 plot_R0()
